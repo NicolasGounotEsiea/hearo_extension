@@ -7,6 +7,7 @@ import { initializeApp } from 'firebase/app';
 const config = {
     apiKey: "AIzaSyDkt17njYmxO7HjMqdsjDhh28xpdmTU7cA",
     authDomain: "hearo-16d22.firebaseapp.com",
+    databaseURL: "https://hearo-16d22-default-rtdb.europe-west1.firebasedatabase.app",
     projectId: "hearo-16d22",
     storageBucket: "hearo-16d22.appspot.com",
     messagingSenderId: "280710785691",
