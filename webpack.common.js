@@ -10,16 +10,16 @@ module.exports = {
   // Using module bundlers we can add the required code for your extension
   // Any modular script should be added as entry point
   entry: {
-    firebase_config: './src/popup/firebase_config.js',
-    popup: './src/popup/popup.js',
-    main_script: './src/popup/main-script.js',
-    settings_script: './src/popup/settings-script.js',
+    firebase_config: './src/popup_views/firebase_config.js',
+    popup: './src/popup_views/popup/popup.js',
+    main_script: './src/popup_views/main/main-script.js',
+    settings_script: './src/popup_views/settings/settings-script.js',
     options: './src/options/options.js',
   },
   plugins: [
     new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, "src", "popup", "popup.html"),
+      template: path.join(__dirname, "src", "popup_views", "popup", "popup.html"),
       filename: "popup.html",
       chunks: ["popup"] // This is script from entry point
     }),
@@ -33,12 +33,12 @@ module.exports = {
       chunks: ["options"] // This is script from entry point
     }),
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, "src", "popup", "main.html"),
+      template: path.join(__dirname, "src", "popup_views", "main", "main.html"),
       filename: "main.html",
       chunks: ["main_script"] // This is script from entry point
     }),
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, "src", "popup", "settings.html"),
+      template: path.join(__dirname, "src", "popup_views", "settings", "settings.html"),
       filename: "settings.html",
       chunks: ["settings_script"] // This is script from entry point
     }),
