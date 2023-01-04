@@ -13,6 +13,7 @@ module.exports = {
     firebase_config: './src/popup_views/firebase_config.js',
     popup: './src/popup_views/popup/popup.js',
     main_script: './src/popup_views/main/main-script.js',
+    content_script: './src/content/content-script.js',
     settings_script: './src/popup_views/settings/settings-script.js',
     options: './src/options/options.js',
   },
