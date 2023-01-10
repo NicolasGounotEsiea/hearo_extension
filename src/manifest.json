@@ -3,8 +3,9 @@
   "version": "0.1",
   "name": "Hearo",
   "description": "Podcast extension",
+
   "action": {
-    "default_popup": "./popup.html",
+    "default_popup": "./main.html",
     "default_icon": {
       "16": "./src/icons/icon.png",
       "32": "./src/icons/icon.png",
@@ -16,20 +17,11 @@
     "storage",
     "activeTab",
     "scripting",
-    "identity"
-  ],
-  "content_scripts": [
-    {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "content.js"
-      ]
-    }
+    "identity",
+    "tabs"
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "./background.js"
   },
   "icons": {
     "16": "./src/icons/icon.png",
@@ -38,6 +30,20 @@
     "128": "./src/icons/icon.png"
   },
   "options_page": "options.html",
+
+  "host_permissions": [
+    "https://podcasts.google.com/*"
+  ],
+
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "src/icons/icon.png"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  
   "oauth2": {
     "client_id": "280710785691-t5ici1s5f1onen11qc1ukk6o9sngnf2f.apps.googleusercontent.com",
     "scopes": [
@@ -45,6 +51,5 @@
       "https://www.googleapis.com/auth/userinfo.profile"
     ]
   },
-
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsYmFyGqjlxK4G5/2kpKQcy9pFU2b1PeGxQOej7dcVy66R1IqQxLPrFuEXWA+ry7SfXnhu8O0ZsPdaBwXMjdp0QQQKwciVERuE4z/bVzhjJ/GC++U2d6JxyI8g/criy7k2/BIFxPDcV+V7ex6x2iFet4t12tt/k9ckZihHfeXogcHEtWiido/8X6JCFvkRQS0m8ijqsdH+HCticAYaZwLLSO0lgvi5kBDo5MXS8WS85OVoQkzamBNM7xXCEFsoV88SaeQ9UTnkAQGfAleFBugw+ux+THjxIZsadxx3ij/Kg80tPsUAj93vAvBMiTMkZkpbG2WCUFOjbI0e5mRItbByQIDAQAB"
 }

@@ -1,13 +1,40 @@
-console.log("---- background.js ----");
+console.log("------------ BACKGROUND.JS IS LOADED ------------");
+
+var mainViewIsOpen = false;
+var userIsLoggedIn = true;
+
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'complete' && /^http/.test(tab.url)) {
+    chrome.scripting.executeScript({
+      target: { tabId: tabId },
+      files: ["./foreground.js"]
+    })
+      .then(() => {
+        console.log("INJECTED THE FOREGROUND SCRIPT.");
+      })
+      .catch(err => console.log(err));
+  }
+});
+
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    userIsLoggedIn = request.userIsLoggedIn;
+    // console.log("request.userIsLoggedIn : ", request.userIsLoggedIn);
+  }
+);
 
 chrome.runtime.onConnect.addListener(function(port) {
-  if (port.name === "popup") {
+  if (port.name === "main") {
+    mainViewIsOpen = true;
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, {mainViewIsOpen: true});
+    });
+    
     port.onDisconnect.addListener(function() {
-      console.log("Popup has been closed");
-      chrome.tabs.query({active: true, currentWindow: true},function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {greeting: "popup_closed"}, function(response) {
-            console.log(response);
-        });
+      mainViewIsOpen = false;
+      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {mainViewIsOpen: false});
       });
     });
   }

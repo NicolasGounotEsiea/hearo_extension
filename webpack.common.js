@@ -11,18 +11,20 @@ module.exports = {
   // Any modular script should be added as entry point
   entry: {
     firebase_config: './src/popup_views/firebase_config.js',
-    popup: './src/popup_views/popup/popup.js',
+    login: './src/popup_views/login/login.js',
     main_script: './src/popup_views/main/main-script.js',
     content_script: './src/content/content-script.js',
+    content: './src/content/content.js',
+    foreground: './src/content/foreground.js',
     settings_script: './src/popup_views/settings/settings-script.js',
     options: './src/options/options.js',
   },
   plugins: [
     new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, "src", "popup_views", "popup", "popup.html"),
-      filename: "popup.html",
-      chunks: ["popup"] // This is script from entry point
+      template: path.join(__dirname, "src", "popup_views", "login", "login.html"),
+      filename: "login.html",
+      chunks: ["login"] // This is script from entry point
     }),
     // Note: you can add as many new HtmlWebpackPlugin objects  
     // filename: being the html filename
@@ -48,7 +50,6 @@ module.exports = {
       patterns: [
         { from: './src/manifest.json' },
         { from: './src/background/background.js' },
-        { from: './src/content/content.js' },
         { from: './src/icons/*' },
         { from: './src/css/*' }
       ],

@@ -1,3 +1,5 @@
+console.log("------------ SETTINGS-SCRIPT.JS IS LOADED ------------");
+
 import { firebaseApp } from '../firebase_config'
 import {
     getAuth,
@@ -20,5 +22,5 @@ onAuthStateChanged(auth, user => {
 
 document.querySelector('#sign_out').addEventListener('click', () => {
   auth.signOut();
-  window.location.replace('./popup.html');
+  window.location.replace('./login.html');
 });
