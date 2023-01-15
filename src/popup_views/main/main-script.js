@@ -37,7 +37,8 @@ document.addEventListener("DOMContentLoaded", function() {
     // doing something
   });
 
-  document.getElementsByClassName("btn_user_profile")[0].addEventListener("click", () => {
+  
+  document.querySelector('#btn_user_profile').addEventListener("click", () => {
     window.location.replace('./settings.html');
   });
   

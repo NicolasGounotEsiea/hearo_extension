@@ -30,7 +30,7 @@ function init() {
 }
 init();
 
-document.querySelector('.btn__google').addEventListener('click', () => {
+document.querySelector('#signin_google').addEventListener('click', () => {
   console.log("google button pressed");
   initFirebaseApp()
 });
