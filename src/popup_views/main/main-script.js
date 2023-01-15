@@ -29,27 +29,28 @@ onAuthStateChanged(auth, user => {
   chrome.runtime.sendMessage({ userIsLoggedIn: userIsLoggedIn });
 });
 
-document.querySelector('#settings').addEventListener('click', () => {
-  window.location.replace('./settings.html');
-});
+
 
 document.addEventListener("DOMContentLoaded", function() {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     console.log(tabs[0].id);
     // doing something
   });
+
+  document.getElementsByClassName("btn_user_profile")[0].addEventListener("click", () => {
+    window.location.replace('./settings.html');
+  });
   
+  chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse) {
+      updateTimeCode(request.startingTime, request.endingTime);
+    }
+  );
 });
 
 function updateTimeCode(startingTime, endingTime) {
   var myElement = document.getElementsByClassName("current_timecode")[0];
   myElement.innerHTML = startingTime + " / " + endingTime;
 }
-
-chrome.runtime.onMessage.addListener(
-  function(request, sender, sendResponse) {
-    updateTimeCode(request.startingTime, request.endingTime);
-  }
-);
 
 chrome.runtime.connect({ name: "main" });

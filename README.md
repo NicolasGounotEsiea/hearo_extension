@@ -1,13 +1,13 @@
 # Hearo extension
 
-## Setup
+## Setup to use the project
 * git clone
 * npm install
 * npm install --save-dev webpack webpack-cli html-webpack-plugin clean-webpack-plugin copy-webpack-plugin
-* npm install firebase firebaseui --save
+* npm install firebase --save
 * npm run build
 
-## Firebase auth
+## How firebase auth works
 * Add zip extension (within the manifest is empty of "key") to 
 [Google Chrome Store Dev Console](https://chrome.google.com/webstore/devconsole)
 * Go to package section and copy public key
