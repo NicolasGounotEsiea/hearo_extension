@@ -3,6 +3,7 @@ console.log("------------ FOREGROUND.JS IS LOADED ------------");
 var popupMainViewIsOpen = false;
 var startingTime = "xx:xx";
 var endingTime = "xx:xx";
+var loopIsActive = false;
 
 function nonstopSendingTimecode() {
   var loop = setInterval(() => {
@@ -25,47 +26,33 @@ function nonstopSendingTimecode() {
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
   console.log(request);
   
-
   if (request.mainViewIsOpen) {
     popupMainViewIsOpen = request.mainViewIsOpen;
-    // nonstopSendingTimecode();
+    if (!loopIsActive) {
+      nonstopSendingTimecode();
+      loopIsActive = true;
+    }
   } else {
+    loopIsActive = false;
     popupMainViewIsOpen = request.mainViewIsOpen;
   }
-
   
   switch (request.playerAction) {
     case 'PLAY PAUSE':
       console.log('PLAY PAUSE');
+      document.querySelector("div[jsname='IGlMSc']").click();
       break;
     case 'PLUS TEN':
       console.log('PLUS TEN');
+      document.querySelector("div[jsname='xBcuNc']").click();
       break;
     case 'MINUS TEN':
       console.log('MINUS TEN');
+      document.querySelector("div[jsname='HQzqRc']").click();
       break;
     case '':
       console.log('RIEN');
       break;
-    default:
-      
+    default:   
   }
-
-
-
-
-  if (request.playerAction !== "") {
-    console.log("foreground.js - request.playerAction = " + request.playerAction);
-    // cliquer sur 
-  } else {
-    console.log("foreground.js - request.playerAction = null");
-  }
-
-  console.log("popupMainViewIsOpen = ", popupMainViewIsOpen);
 });
-
-
-
-console.log("minus ten");
-console.log("play pause");
-console.log("plus ten");
