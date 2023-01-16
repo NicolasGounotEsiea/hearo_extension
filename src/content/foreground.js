@@ -5,11 +5,13 @@ var startingTime = "xx:xx";
 var endingTime = "xx:xx";
 var loopIsActive = false;
 var podcastIsPlaying = true;
+var episodeTitle = "";
 
 function nonstopSendingTimecode() {
   var loop = setInterval(() => {
     startingTime = document.getElementsByClassName("oG0wpe")[0].firstChild.textContent;
     endingTime = document.getElementsByClassName("oG0wpe")[0].lastChild.textContent;
+    episodeTitle = document.querySelector("div[jsname='jLuDgc']").textContent;
     
     if (document.querySelector("div[jsname='IGlMSc']").ariaLabel === "Lecture") {
       podcastIsPlaying = false;
@@ -23,7 +25,8 @@ function nonstopSendingTimecode() {
       chrome.runtime.sendMessage({
         podcastIsPlaying: podcastIsPlaying,
         startingTime: startingTime,
-        endingTime: endingTime
+        endingTime: endingTime,
+        episodeTitle: episodeTitle
       });
 
       console.log("Podcast is playing = " + podcastIsPlaying);
