@@ -1,20 +1,17 @@
+// *************************************************************
+// *************************************************************
 console.log("------------ SETTINGS-SCRIPT.JS IS LOADED ------------");
+// *************************************************************
+// *************************************************************
 
 import { firebaseApp } from '../firebase_config'
-import {
-    getAuth,
-    onAuthStateChanged
-} from 'firebase/auth';
-// Auth instance for the current firebaseApp
-const auth = getAuth(firebaseApp);
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
-console.log("popup main!")
+const auth = getAuth(firebaseApp); // Auth instance for the current firebaseApp
 
 onAuthStateChanged(auth, user => {
   if (user != null) {
-    console.log('logged in!');
-    console.log("current")
-    console.log(user)
+    console.log('Logged in and current user is : ', user);
   } else {
     console.log('No user');
   }
@@ -22,5 +19,6 @@ onAuthStateChanged(auth, user => {
 
 document.querySelector('#sign_out').addEventListener('click', () => {
   auth.signOut();
+  console.log('User sign out ! Lets go to login.html ...');
   window.location.replace('./login.html');
 });
