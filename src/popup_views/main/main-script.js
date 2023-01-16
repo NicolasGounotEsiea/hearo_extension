@@ -11,6 +11,7 @@ import {
 } from 'firebase/auth';
 
 var userIsLoggedIn = false;
+var podcastIsPlaying = false;
 
 // Auth instance for the current firebaseApp
 const auth = getAuth(firebaseApp);
@@ -63,8 +64,6 @@ document.addEventListener("DOMContentLoaded", function() {
         mainViewIsOpen: true
       });
     });
-
-
   });
 
   
@@ -74,6 +73,12 @@ document.addEventListener("DOMContentLoaded", function() {
   
   chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
+      if (request.podcastIsPlaying) {
+        podcastIsPlaying = true;
+      } else {
+        podcastIsPlaying = false;
+      }
+      
       updateTimeCode(request.startingTime, request.endingTime);
     }
   );
