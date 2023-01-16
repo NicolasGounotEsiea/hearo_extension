@@ -631,17 +631,10 @@ const DB =  [
 
 document.addEventListener("DOMContentLoaded", function() {
 
-  if(timecode != 0){
-    console.log(timecode)
-  }
+ 
 
-  chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
+  
 
-      updateTimeCode(request.startingTime, request.endingTime);
-      timecode = request.startingTime
-    }
-  );
 
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     console.log(tabs[0].id);
@@ -678,9 +671,17 @@ document.addEventListener("DOMContentLoaded", function() {
   
   chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
+      if (request.podcastIsPlaying) {
+        podcastIsPlaying = true;
+      } else {
+        podcastIsPlaying = false;
+      }
       updateTimeCode(request.startingTime, request.endingTime);
+      timecode = request.startingTime
     }
   );
+
+  
 });
 
 function updateTimeCode(startingTime, endingTime) {
@@ -689,3 +690,7 @@ function updateTimeCode(startingTime, endingTime) {
 }
 
 chrome.runtime.connect({ name: "main" });
+
+while(podcastIsPlaying == true){
+  console.log(timecode)
+}
