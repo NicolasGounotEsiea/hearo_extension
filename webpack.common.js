@@ -17,7 +17,7 @@ module.exports = {
     content: './src/content/content.js',
     foreground: './src/content/foreground.js',
     settings_script: './src/popup_views/settings/settings-script.js',
-    options: './src/options/options.js',
+    options: './src/options/options.js'
   },
   plugins: [
     new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
@@ -51,7 +51,8 @@ module.exports = {
         { from: './src/manifest.json' },
         { from: './src/background/background.js' },
         { from: './src/icons/*' },
-        { from: './src/css/*' }
+        { from: './src/css/*' },
+        { from: './src/popup_views/main/database.json' }
       ],
     }),
   ],
