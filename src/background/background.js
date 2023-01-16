@@ -28,13 +28,22 @@ chrome.runtime.onConnect.addListener(function(port) {
   if (port.name === "main") {
     mainViewIsOpen = true;
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, {mainViewIsOpen: true});
+      // chrome.tabs.sendMessage(tabs[0].id, {mainViewIsOpen: true});
+      chrome.tabs.sendMessage(tabs[0].id, {
+        playerAction: "",
+        userIsLoggedIn: userIsLoggedIn,
+        mainViewIsOpen: true
+      });
     });
     
     port.onDisconnect.addListener(function() {
       mainViewIsOpen = false;
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {mainViewIsOpen: false});
+        chrome.tabs.sendMessage(tabs[0].id, {
+          playerAction: "",
+          userIsLoggedIn: userIsLoggedIn,
+          mainViewIsOpen: false
+        });
       });
     });
   }
