@@ -55,3 +55,5 @@ function updateTimeCode(startingTime, endingTime) {
 }
 
 chrome.runtime.connect({ name: "main" });
+
+var DB = 
