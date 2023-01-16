@@ -26,7 +26,12 @@ onAuthStateChanged(auth, user => {
     userIsLoggedIn = false;
     window.location.replace('./login.html');
   }
-  chrome.runtime.sendMessage({ userIsLoggedIn: userIsLoggedIn });
+  
+  chrome.tabs.sendMessage(tabs[0].id, {
+    playerAction: "TEST",
+    userIsLoggedIn: userIsLoggedIn,
+    mainViewIsOpen: true
+  });
 });
 
 
@@ -35,6 +40,31 @@ document.addEventListener("DOMContentLoaded", function() {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     console.log(tabs[0].id);
     // doing something
+    document.querySelector('#minus_ten').addEventListener("click", () => {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        playerAction: "MINUS TEN",
+        userIsLoggedIn: userIsLoggedIn,
+        mainViewIsOpen: true
+      });
+    });
+
+    document.querySelector('#play_pause').addEventListener("click", () => {  
+      chrome.tabs.sendMessage(tabs[0].id, {
+        playerAction: "PLAY PAUSE",
+        userIsLoggedIn: userIsLoggedIn,
+        mainViewIsOpen: true
+      });
+    });
+
+    document.querySelector('#plus_ten').addEventListener("click", () => {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        playerAction: "PLUS TEN",
+        userIsLoggedIn: userIsLoggedIn,
+        mainViewIsOpen: true
+      });
+    });
+
+
   });
 
   
