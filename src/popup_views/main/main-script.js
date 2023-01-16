@@ -28,11 +28,14 @@ onAuthStateChanged(auth, user => {
     window.location.replace('./login.html');
   }
   
-  chrome.tabs.sendMessage(tabs[0].id, {
-    playerAction: "TEST",
-    userIsLoggedIn: userIsLoggedIn,
-    mainViewIsOpen: true
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, {
+      playerAction: "TEST",
+      userIsLoggedIn: userIsLoggedIn,
+      mainViewIsOpen: true
+    });
   });
+
 });
 
 
@@ -90,5 +93,3 @@ function updateTimeCode(startingTime, endingTime) {
 }
 
 chrome.runtime.connect({ name: "main" });
-
-var DB = 
