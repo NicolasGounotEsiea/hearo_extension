@@ -4,6 +4,9 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
+
+
+  
   // Note: 
   // Chrome MV3 no longer allowed remote hosted code
   // Using module bundlers we can add the required code for your extension

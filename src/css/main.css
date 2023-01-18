@@ -15,3 +15,63 @@ body {
   border-radius: 100%;
   font-size: 18px;
 }
+
+
+.chat-message {
+  display: flex;
+  align-items: flex-start;
+  padding: 5px;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  background-color: #f5f5f5;
+}
+
+.chat-message-content {
+  flex-grow: 1;
+}
+
+.chat-message-username {
+  font-weight: bold;
+  margin-bottom: 2px;
+  margin-top: 2px;
+
+  
+}
+
+.chat-message-text {
+  color: #333;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+
+.user-message {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+.user-message .chat-message-content {
+  text-align: right;
+}
+
+.user-message .chat-message-username {
+  margin-left: 10px;
+}
+
+.chat-message-username .time {
+  font-weight: normal;
+  font-size: smaller;
+  color: gray;
+  margin-right: 4px;
+  margin-left: 4px;
+}
+
+.chat-message-username .pubpri {
+  font-weight: normal;
+  font-size: smaller;
+  margin-right: 4px;
+ 
+}

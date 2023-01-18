@@ -1,7 +1,7 @@
 console.log("------------ MAINS-CRIPT.JS IS LOADED ------------");
 
 var timecode = 0;
-
+var userid;
 import { firebaseApp } from '../firebase_config'
 import {
     getAuth,
@@ -23,6 +23,7 @@ onAuthStateChanged(auth, user => {
   if (user != null) {
     console.log('Below User is logged in :')
     console.log(user)
+    userid =  user.uid
     userIsLoggedIn = true;
   } else {
     console.log('No user logged in!');
@@ -30,11 +31,14 @@ onAuthStateChanged(auth, user => {
     window.location.replace('./login.html');
   }
   
-  chrome.tabs.sendMessage(tabs[0].id, {
-    playerAction: "TEST",
-    userIsLoggedIn: userIsLoggedIn,
-    mainViewIsOpen: true
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, {
+      playerAction: "TEST",
+      userIsLoggedIn: userIsLoggedIn,
+      mainViewIsOpen: true
+    });
   });
+
 });
 
 const DB =  [
@@ -43,10 +47,37 @@ const DB =  [
 		"TimeCode":"00:01",
         "UserName":"heh",
         "Private":"0",
-        "UUID":"hyhWpdw7k7cR4fWErxXjiHHLs5t2",
-        "Comment":"alle "
+        "UUID":"hyhWpdw7k7cR4fWErxXjiHHLs5t1",
+        "Comment":"alle cdcxvxvdf swdfsdfsdf qsdfqedf qdfqdfsq dfqdfq dqdfqd q sqdfsfs "
 
     },
+    {
+      "podcast":"Episode spécial Halloween 🎃​ : Les Dullahans ​de Loys Brueyre",
+      "TimeCode":"00:01",
+          "UserName":"heh",
+          "Private":"0",
+          "UUID":"hyhWpdw7k7cR4fWErxXjiHHLs5t1",
+          "Comment":"alle cdcxvxvdf swdfsdfsdf qsdfqedf qdfqdfsq dfqdfq dqdfqd q sqdfsfs "
+  
+      },
+      {
+        "podcast":"Episode spécial Halloween 🎃​ : Les Dullahans ​de Loys Brueyre",
+        "TimeCode":"00:01",
+            "UserName":"heh",
+            "Private":"0",
+            "UUID":"hyhWpdw7k7cR4fWErxXjiHHLs5t1",
+            "Comment":"alle cdcxvxvdf swdfsdfsdf qsdfqedf qdfqdfsq dfqdfq dqdfqd q sqdfsfs "
+    
+        },
+        {
+          "podcast":"Episode spécial Halloween 🎃​ : Les Dullahans ​de Loys Brueyre",
+          "TimeCode":"00:01",
+              "UserName":"heh",
+              "Private":"0",
+              "UUID":"hyhWpdw7k7cR4fWErxXjiHHLs5t1",
+              "Comment":"alle cdcxvxvdf swdfsdfsdf qsdfqedf qdfqdfsq dfqdfq dqdfqd q sqdfsfs "
+      
+          },
     {
 		"podcast":"Episode spécial Halloween 🎃​ : Les Dullahans ​de Loys Brueyre",
 		"TimeCode":"00:02",
@@ -77,16 +108,16 @@ const DB =  [
 		"podcast":"Episode spécial Halloween 🎃​ : Les Dullahans ​de Loys Brueyre",
 		"TimeCode":"00:05",
         "UserName":"nana",
-        "Private":"0",
-        "UUID":"hyhWpdw7k7cR4fWErxXjiHHLs5t2",
-        "Comment":"alleallealleallealle ttttt"
+        "Private":"1",
+        "UUID":"hyhWpdw7k7cR4fWErxXjiHHLs5t1",
+        "Comment":"mon commentaire PERSOOOOO"
 
     },{
 		"podcast":"Episode spécial Halloween 🎃​ : Les Dullahans ​de Loys Brueyre",
 		"TimeCode":"00:06",
         "UserName":"pop",
         "Private":"0",
-        "UUID":"hyhWpdw7k7cR4fWErxXjiHHLs5t2",
+        "UUID":"hyhWpdw7k7cR4fWErxXjiHHLs5t1",
         "Comment":"alle alleallealle alletyu"
 
     },{
@@ -102,7 +133,7 @@ const DB =  [
 		"TimeCode":"00:08",
         "UserName":"sasa",
         "Private":"0",
-        "UUID":"hyhWpdw7k7cR4fWErxXjiHHLs5t2",
+        "UUID":"hyhWpdw7k7cR4fWErxXjiHHLs5t22",
         "Comment":"alle"
 
     },{
@@ -126,15 +157,15 @@ const DB =  [
 		"TimeCode":"00:11",
         "UserName":"rasra",
         "Private":"1",
-        "UUID":"hyhWpdw7k7cR4fWErxXjiHHLs5t2",
-        "Comment":"hahah peeàpeopeopeo"
+        "UUID":"hyhWpdw7k7cR4fWErxXjiHHLs5t1",
+        "Comment":"mon commentaire PERSOOOOO"
 
     },{
 		"podcast":"Episode spécial Halloween 🎃​ : Les Dullahans ​de Loys Brueyre",
 		"TimeCode":"00:12",
         "UserName":"rasra",
         "Private":"0",
-        "UUID":"hyhWpdw7k7cR4fWErxXjiHHLs5t2",
+        "UUID":"hyhWpdw7k7cR4fWErxXjiHHLs5t1",
         "Comment":"ratatatata gagagaga"
 
     },{
@@ -165,9 +196,9 @@ const DB =  [
 		"podcast":"Episode spécial Halloween 🎃​ : Les Dullahans ​de Loys Brueyre",
 		"TimeCode":"00:16",
         "UserName":"dfg",
-        "Private":"0",
+        "Private":"1",
         "UUID":"hyhWpdw7k7cR4fWErxXjiHHLs5t2",
-        "Comment":"nonnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn"
+        "Comment":"nonnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn"
 
     },{
 		"podcast":"Episode spécial Halloween 🎃​ : Les Dullahans ​de Loys Brueyre",
@@ -471,7 +502,7 @@ const DB =  [
         "UserName":"cuit",
         "Private":"0",
         "UUID":"hyhWpdw7k7cR4fWErxXjiHHLs5t2",
-        "Comment":"nonnnnnnnnnnnnnnnnnnnnnnnnnnnn siiiiiiiiiiiiiiiiiiiiiiiiii"
+        "Comment":"nonnnnnnnnnnnn siiiiiiiiiiiiiiiiiiiiiiiiii"
 
     },{
 		"podcast":"Episode spécial Halloween 🎃​ : Les Dullahans ​de Loys Brueyre",
@@ -629,11 +660,12 @@ const DB =  [
 	
 ]
 
+var limite = 10
+var numMess = 0
+
+
 document.addEventListener("DOMContentLoaded", function() {
 
- 
-
-  
 
 
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
@@ -678,6 +710,63 @@ document.addEventListener("DOMContentLoaded", function() {
       }
       updateTimeCode(request.startingTime, request.endingTime);
       timecode = request.startingTime
+      if(podcastIsPlaying == true){
+        var preced
+        var mess = testComment(timecode)
+        // console.log(mess.TimeCode)
+        const messageElement = document.createElement('div');
+        messageElement.id = numMess
+        
+        
+
+        
+        var pri = "Private"
+        console.log(mess.UUID)
+        if(mess.UUID == userid){
+          numMess++
+          if(mess.Private == 0){
+            pri = "Public"
+          }
+          messageElement.innerHTML = `<div class="chat-message user-message">
+          <div class="chat-message-content">
+            <p class="chat-message-username"> <span class="pubpri">${pri}</span><span class="time">${mess.TimeCode}</span>${mess.UserName}</p>
+            <p class="chat-message-text">${mess.Comment}</p>
+          </div>
+        </div>
+        
+        `;
+          const messagesContainer = document.querySelector('#messages');
+          messagesContainer.appendChild(messageElement);
+          preced = messagesContainer
+        }
+        else{
+          numMess++
+          messageElement.innerHTML = ` <div class="chat-message">
+          <div class="chat-message-content">
+            <p class="chat-message-username">${mess.UserName}  <span class="time">${mess.TimeCode}</span> </p>
+            <p class="chat-message-text">${mess.Comment}</p>
+          </div>
+        </div>
+         `;
+          const messagesContainer = document.querySelector('#messages');
+          messagesContainer.appendChild(messageElement);
+          preced = messagesContainer
+        }
+
+
+        // Check if message limit is exceeded
+        if (numMess > limite) {
+          const messagesToDelete = numMess - limite -1;
+          
+            let myDiv = document.getElementById(messagesToDelete);
+            console.log(myDiv)
+            myDiv.parentNode.removeChild(myDiv);
+            
+          
+        }
+
+      }
+    
     }
   );
 
@@ -689,8 +778,14 @@ function updateTimeCode(startingTime, endingTime) {
   myElement.innerHTML = startingTime + " / " + endingTime;
 }
 
+function testComment(timecode){
+  for(var com = 0; com < DB.length ; com ++){
+    if(DB[com].TimeCode == timecode  /*DB[com].podcast == podcastname*/ ){
+      return DB[com]
+    }
+  }
+}
 chrome.runtime.connect({ name: "main" });
 
-while(podcastIsPlaying == true){
-  console.log(timecode)
-}
+
+
