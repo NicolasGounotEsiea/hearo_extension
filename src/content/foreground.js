@@ -1,42 +1,52 @@
+// *************************************************************
+// *************************************************************
 console.log("------------ FOREGROUND.JS IS LOADED ------------");
+// *************************************************************
+// *************************************************************
 
 var popupMainViewIsOpen = false;
 var startingTime = "xx:xx";
 var endingTime = "xx:xx";
 var loopIsActive = false;
 var podcastIsPlaying = true;
+var currentEpisode = {
+  episodeTitle: "",
+  podcastRssUrl: ""
+};
 
 function nonstopSendingTimecode() {
   var loop = setInterval(() => {
-    startingTime = document.getElementsByClassName("oG0wpe")[0].firstChild.textContent;
-    endingTime = document.getElementsByClassName("oG0wpe")[0].lastChild.textContent;
-    
-    if (document.querySelector("div[jsname='IGlMSc']").ariaLabel === "Lecture") {
-      podcastIsPlaying = false;
-    } else if (document.querySelector("div[jsname='IGlMSc']").ariaLabel === "Pause") {
-      podcastIsPlaying = true;
-    }
+    if (loopIsActive) {
+      startingTime = document.getElementsByClassName("oG0wpe")[0].firstChild.textContent;
+      endingTime = document.getElementsByClassName("oG0wpe")[0].lastChild.textContent;
+      currentEpisode.episodeTitle = document.querySelector("div[jsname='jLuDgc']").textContent;
+      currentEpisode.podcastRssUrl = document.querySelector("div[jsname='NTHlvd']").textContent;
+      
+      if (document.querySelector("div[jsname='IGlMSc']").ariaLabel === "Lecture") {
+        podcastIsPlaying = false;
+      } else if (document.querySelector("div[jsname='IGlMSc']").ariaLabel === "Pause") {
+        podcastIsPlaying = true;
+      }
 
-    if (popupMainViewIsOpen) {
-      console.log("Popup main view is open & current timecode = " + startingTime + " / " + endingTime);
-
-      chrome.runtime.sendMessage({
-        podcastIsPlaying: podcastIsPlaying,
-        startingTime: startingTime,
-        endingTime: endingTime
-      });
-
-      console.log("Podcast is playing = " + podcastIsPlaying);
+      if (popupMainViewIsOpen) {
+        console.log("Main open - podcast playing ("+podcastIsPlaying+") - Timecode (" + startingTime + " / " + endingTime + ")");
+        chrome.runtime.sendMessage({
+          podcastIsPlaying: podcastIsPlaying,
+          startingTime: startingTime,
+          endingTime: endingTime,
+          episodeTitle: currentEpisode.episodeTitle
+        });
+      } else {
+        clearInterval(loop);
+        console.log("Popup main view is not open");
+      }
     } else {
       clearInterval(loop);
-      console.log("Popup main view is not open");
     }
   }, 1000);
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
-  console.log(request);
-  
   if (request.mainViewIsOpen) {
     popupMainViewIsOpen = request.mainViewIsOpen;
     if (!loopIsActive) {
@@ -53,8 +63,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
       console.log('PLAY PAUSE');
       document.querySelector("div[jsname='IGlMSc']").click();
       break;
-    case 'PLUS TEN':
-      console.log('PLUS TEN');
+    case 'PLUS THIRTY':
+      console.log('PLUS THIRTY');
       document.querySelector("div[jsname='xBcuNc']").click();
       break;
     case 'MINUS TEN':
