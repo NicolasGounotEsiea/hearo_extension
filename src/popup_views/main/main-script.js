@@ -734,8 +734,16 @@ document.addEventListener("DOMContentLoaded", function() {
     function(request, sender, sendResponse) {
       if (request.podcastIsPlaying) {
         podcastIsPlaying = true;
+        console.log("avant modif:",document.getElementById("play_pause").style.backgroundImage)
+        document.getElementById("play_pause").style.backgroundImage = "url(../icons/pause.png)";
+        console.log("après modif:",document.getElementById("play_pause").style.backgroundImage)
+        
       } else {
         podcastIsPlaying = false;
+        console.log("avant modif:",document.getElementById("play_pause").style.backgroundImage)
+        document.getElementById("play_pause").style.backgroundImage = "url(../icons/play.png)";
+        console.log("après modif:",document.getElementById("play_pause").style.backgroundImage)
+        
       }
       updateTimeCode(request.startingTime, request.endingTime);
       timecode = request.startingTime
@@ -909,3 +917,5 @@ function updtateEpisodeTitle(episodeTitle) {
   myElement.innerHTML = episodeTitle;
 }
 
+
+play_pause_button=document.getElementById("")
