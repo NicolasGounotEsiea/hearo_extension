@@ -14,11 +14,16 @@ var podcastIsPlaying = false;
 var startingTime = "";
 var endingTime = "";
 var lastComment = {
-  uid: "",
-  comment: "",
-  startingTime: "",
-  private: true,
-  podcastName: ""
+  podcast: "",
+  TimeCode: "",
+  UserName:"",
+  Private: "0",
+  UUID: "",
+  Comment: ""
+  
+  
+  
+  
 };
 var episodeTitle = "";
 var userID = "";
@@ -862,12 +867,21 @@ chrome.runtime.onMessage.addListener(
 );
 
 document.querySelector('#publishBtn').addEventListener("click", () => {
-  lastComment.comment = document.getElementById("text_field").value;
-  lastComment.startingTime = startingTime;
-  lastComment.uid = userID;
-  lastComment.episodeTitle = episodeTitle;
+  lastComment.podcast = episodeTitle;
+  lastComment.TimeCode = startingTime;
+  lastComment.UserName = "nico";
+  lastComment.UUID = userID;
+  lastComment.Comment = document.getElementById("text_field").value;
+  
+  
+  
   document.getElementById("text_field").value = "";
   console.log("SUBMIT : ", lastComment);
+
+  DB.unshift(lastComment)
+  console.log(DB)
+
+
 
 });
 
@@ -879,7 +893,8 @@ function updateTimeCode(startingTime, endingTime) {
 
 function testComment(timecode){
   for(var com = 0; com < DB.length ; com ++){
-    if(DB[com].TimeCode == timecode  /*DB[com].podcast == podcastname*/ ){
+    if(DB[com].TimeCode + 1<= timecode  /*DB[com].podcast == podcastname*/ ){
+      console.log(DB[com].TimeCode + 1)
       return DB[com]
     }
   }

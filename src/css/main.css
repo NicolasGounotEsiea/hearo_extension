@@ -89,7 +89,8 @@ body {
 
 .chat-container {
   height: 300px;
-  overflow-y:auto;
+  overflow-y:auto;}
+
 
 h3{
   position: absolute;
