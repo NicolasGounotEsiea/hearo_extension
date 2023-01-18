@@ -731,6 +731,15 @@ document.addEventListener("DOMContentLoaded", function() {
     window.location.replace('./settings.html');
   });
 
+  const mySwitch = document.getElementById("private");
+  mySwitch.addEventListener("change", function() {
+    if (mySwitch.checked) {
+      document.getElementById("private").value = "1";
+    } else {
+      document.getElementById("private").value = "0";
+    }
+  });
+
   
   chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
