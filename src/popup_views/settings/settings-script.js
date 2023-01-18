@@ -22,3 +22,7 @@ document.querySelector('#sign_out').addEventListener('click', () => {
   console.log('User sign out ! Lets go to login.html ...');
   window.location.replace('./login.html');
 });
+
+document.querySelector('#back').addEventListener('click', () => {
+  window.location.replace('./main.html');
+});
