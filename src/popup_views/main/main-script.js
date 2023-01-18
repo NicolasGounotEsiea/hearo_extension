@@ -909,3 +909,16 @@ function updtateEpisodeTitle(episodeTitle) {
   myElement.innerHTML = episodeTitle;
 }
 
+
+chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
+  let url = tabs[0].url;
+  console.log(url);
+  console.log(url.search("podcasts.google"));
+  if(url.search("podcasts.google") == -1)
+  {
+    console.log(url.search("podcasts.google"));
+    window.location.replace('./wrong_tab.html');
+  }
+  // use `url` here inside the callback because it's asynchronous!
+}); 
+
