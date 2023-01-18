@@ -8,7 +8,9 @@ var timecode = 0;
 var userid;
 import { firebaseApp } from '../firebase_config'
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-
+var mess="";
+var messageElement ="";
+var preced="";
 var userIsLoggedIn = false;
 var podcastIsPlaying = false;
 var startingTime = "";
@@ -740,11 +742,11 @@ document.addEventListener("DOMContentLoaded", function() {
       updateTimeCode(request.startingTime, request.endingTime);
       timecode = request.startingTime
       if(podcastIsPlaying == true){
-        var preced
         
-        var mess = testComment(timecode)
+        
+        mess = testComment(timecode)
         // console.log(mess.TimeCode)
-        const messageElement = document.createElement('div');
+        messageElement = document.createElement('div');
         messageElement.id = numMess
         
         
@@ -878,6 +880,8 @@ document.querySelector('#publishBtn').addEventListener("click", () => {
   document.getElementById("text_field").value = "";
   console.log("SUBMIT : ", lastComment);
 
+  testAff(lastComment)
+
   DB.unshift(lastComment)
   console.log(DB)
 
@@ -893,7 +897,7 @@ function updateTimeCode(startingTime, endingTime) {
 
 function testComment(timecode){
   for(var com = 0; com < DB.length ; com ++){
-    if(DB[com].TimeCode + 1<= timecode  /*DB[com].podcast == podcastname*/ ){
+    if(DB[com].TimeCode == timecode  /*DB[com].podcast == podcastname*/ ){
       console.log(DB[com].TimeCode + 1)
       return DB[com]
     }
@@ -907,5 +911,27 @@ chrome.runtime.connect({ name: "main" });
 function updtateEpisodeTitle(episodeTitle) {
   var myElement = document.getElementsByClassName("episodeTitle")[0];
   myElement.innerHTML = episodeTitle;
+}
+
+function testAff(mess ){
+
+  messageElement = document.createElement('div');
+
+  var pri = "Private"
+  if(mess.Private == 0){
+    pri = "Public"
+  }
+  messageElement.innerHTML = `<div class="chat-message user-message">
+  <div class="chat-message-content">
+    <p class="chat-message-username"> <span class="pubpri">${pri}</span><span class="time">${mess.TimeCode}</span>${mess.UserName}</p>
+    <p class="chat-message-text">${mess.Comment}</p>
+  </div>
+</div>
+
+`;
+  const messagesContainer = document.querySelector('#messages');
+  messagesContainer.appendChild(messageElement);
+  preced = messagesContainer
+
 }
 
