@@ -1,0 +1,69 @@
+body {
+    position: inherit;
+    display: block;
+    flex-direction: column;
+    justify-content: center;
+    background: #261C40;
+    font-family: "Lato", sans-serif;
+    width: 300px;
+    height: 400px;
+  }
+  
+  
+  h3{
+    position: absolute;
+    width: 37px;
+    height: 12px;
+    left: calc(50% - 37px/2);
+    top: 0px;
+  
+    font-family: Helvetica;
+    font-style: normal;
+    font-weight: 900;
+    font-size: 10px;
+    line-height: 12px;
+    /* identical to box height */
+  
+    display: flex;
+    align-items: center;
+    text-align: center;
+    letter-spacing: 0.10em;
+  
+    color: #FFFFFF;
+  }
+  
+  
+  .open-google-podcast-btn {
+    
+    transition: background-color .3s, box-shadow .3s;
+      
+    padding: 12px 16px 12px;
+    border: none;
+    border-radius: 3px;
+    box-shadow: 0 -1px 0 rgba(0, 0, 0, .04), 0 1px 1px rgba(0, 0, 0, .25);
+    
+    color: #757575;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans","Helvetica Neue",sans-serif;
+    
+    margin: 0 auto;
+  }
+  
+  .container{
+    display: flex;
+    justify-content: center;
+  }
+  
+  .text{
+    vertical-align: middle;
+    text-align: center;
+    padding-bottom: 10px;
+    padding-top: 50px;
+    position: inherit;
+    display: flex;
+    justify-content: center;
+    color: white;
+    font-family: Cambria, serif;
+    font-size: large;
+  }
