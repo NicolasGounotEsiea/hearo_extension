@@ -8,14 +8,14 @@ var timecode = 0
 var userid
 import { firebaseApp, db } from '../firebase_config'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, getDocs } from 'firebase/firestore'
 
 var userIsLoggedIn = false
 var podcastIsPlaying = false
 var startingTime = ''
 var endingTime = ''
 var lastComment = {
-  podcast: '',
+  podcastEpisode: {},
   TimeCode: '',
   UserName: '',
   Private: '0',
@@ -27,19 +27,16 @@ var userID = ''
 const auth = getAuth(firebaseApp) // Auth instance for the current firebaseApp
 
 try {
-  const docRef = await addDoc(collection(db, "users"), {
-    name: "Hely",
-    name2: "Heloooo"
-  });
-  console.log("Document written with ID: ", docRef.id);
+  const docRef = await addDoc(collection(db, 'users'), lastComment)
+  console.log('Document written with ID: ', docRef.id)
 } catch (e) {
-  console.error("Error adding document: ", e);
+  console.error('Error adding document: ', e)
 }
 
-const querySnapshot = await getDocs(collection(db, "users"));
-querySnapshot.forEach((doc) => {
-  console.log(`${doc.id} => ${doc.data().name}`);
-});
+const querySnapshot = await getDocs(collection(db, 'users'))
+querySnapshot.forEach(doc => {
+  console.log(`${doc.id} => ${doc.data().name}`)
+})
 
 chrome.runtime.connect({ name: 'main' })
 
