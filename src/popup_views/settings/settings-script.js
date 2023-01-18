@@ -24,3 +24,7 @@ document.querySelector('#sign_out').addEventListener('click', () => {
   auth.signOut();
   window.location.replace('./login.html');
 });
+
+document.querySelector('#back').addEventListener('click', () => {
+  window.location.replace('./main.html');
+});
