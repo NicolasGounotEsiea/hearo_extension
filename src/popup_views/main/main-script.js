@@ -712,6 +712,7 @@ document.addEventListener("DOMContentLoaded", function() {
       timecode = request.startingTime
       if(podcastIsPlaying == true){
         var preced
+        
         var mess = testComment(timecode)
         // console.log(mess.TimeCode)
         const messageElement = document.createElement('div');
@@ -754,6 +755,50 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
 
+        messageElement.scrollIntoView({behavior: "smooth", block: "end"});
+
+        
+//           var chatContainer = document.querySelector('.chat-container');
+//           var isScrolledToBottom = chatContainer.scrollHeight - chatContainer.clientHeight <= chatContainer.scrollTop + 1;
+//           chatContainer.appendChild(messageElement);
+//           if(isScrolledToBottom) {
+//           requestAnimationFrame(function(){
+//             chatContainer.scrollTop = chatContainer.scrollHeight;
+//             messageElement.scrollIntoView({behavior: "smooth", block: "end"});
+//           });
+// }
+
+        
+
+        
+
+        
+        // var chatContainer = document.querySelector('.chat-container');
+        // var isScrolledToBottom = chatContainer.scrollHeight - chatContainer.clientHeight <= chatContainer.scrollTop + 1;
+        // chatContainer.appendChild(message);
+        // if(isScrolledToBottom) {
+        //   requestAnimationFrame(function(){
+        //   chatContainer.scrollTop = chatContainer.scrollHeight;
+        //   messageElement.scrollIntoView({behavior: "smooth", block: "end"});
+        //   });
+        // }
+
+        // var chatContainer = document.querySelector('.chat-container');
+        // var isScrolledToBottom = chatContainer.scrollHeight - chatContainer.clientHeight <= chatContainer.scrollTop + 1;
+        // chatContainer.appendChild(message);
+        // if(isScrolledToBottom) {
+        //   messagesContainer.scrollIntoView({behavior: "smooth", block: "end"});
+        //    chatContainer.scrollTop = chatContainer.scrollHeight ;
+           
+
+           
+        // }
+
+        
+        
+
+        
+
         // Check if message limit is exceeded
         if (numMess > limite) {
           const messagesToDelete = numMess - limite -1;
@@ -764,6 +809,9 @@ document.addEventListener("DOMContentLoaded", function() {
             
           
         }
+
+
+        
 
       }
     

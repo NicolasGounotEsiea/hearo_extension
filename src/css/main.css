@@ -75,3 +75,8 @@ body {
   margin-right: 4px;
  
 }
+
+.chat-container {
+  height: 300px;
+  overflow-y:auto;
+}
