@@ -5,7 +5,7 @@
   "description": "Podcast extension",
 
   "action": {
-    "default_popup": "./wrong_tab.html",
+    "default_popup": "./main.html",
     "default_icon": {
       "16": "./src/icons/icon.png",
       "32": "./src/icons/icon.png",
