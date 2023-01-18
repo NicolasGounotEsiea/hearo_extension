@@ -62,6 +62,7 @@ function startAuth(interactive) {
       const credential = GoogleAuthProvider.credential(null, token);
       signInWithCredential(auth, credential).then((result) => {
         console.log("Success!!! -- result : ", result);
+        window.location.replace('./main.html');
       }).catch((error) => {
         console.log(error);
       });

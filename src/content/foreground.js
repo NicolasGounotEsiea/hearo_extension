@@ -9,14 +9,18 @@ var startingTime = "xx:xx";
 var endingTime = "xx:xx";
 var loopIsActive = false;
 var podcastIsPlaying = true;
-var episodeTitle = "";
+var currentEpisode = {
+  episodeTitle: "",
+  podcastRssUrl: ""
+};
 
 function nonstopSendingTimecode() {
   var loop = setInterval(() => {
     if (loopIsActive) {
       startingTime = document.getElementsByClassName("oG0wpe")[0].firstChild.textContent;
       endingTime = document.getElementsByClassName("oG0wpe")[0].lastChild.textContent;
-      episodeTitle = document.querySelector("div[jsname='jLuDgc']").textContent;
+      currentEpisode.episodeTitle = document.querySelector("div[jsname='jLuDgc']").textContent;
+      currentEpisode.podcastRssUrl = document.querySelector("div[jsname='NTHlvd']").textContent;
       
       if (document.querySelector("div[jsname='IGlMSc']").ariaLabel === "Lecture") {
         podcastIsPlaying = false;
@@ -30,7 +34,7 @@ function nonstopSendingTimecode() {
           podcastIsPlaying: podcastIsPlaying,
           startingTime: startingTime,
           endingTime: endingTime,
-          episodeTitle: episodeTitle
+          episodeTitle: currentEpisode.episodeTitle
         });
       } else {
         clearInterval(loop);
@@ -43,9 +47,6 @@ function nonstopSendingTimecode() {
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
-  // console.log("request : ", request);
-  // console.log("sender : ", sender);
-  
   if (request.mainViewIsOpen) {
     popupMainViewIsOpen = request.mainViewIsOpen;
     if (!loopIsActive) {
@@ -62,8 +63,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
       console.log('PLAY PAUSE');
       document.querySelector("div[jsname='IGlMSc']").click();
       break;
-    case 'PLUS TEN':
-      console.log('PLUS TEN');
+    case 'PLUS THIRTY':
+      console.log('PLUS THIRTY');
       document.querySelector("div[jsname='xBcuNc']").click();
       break;
     case 'MINUS TEN':

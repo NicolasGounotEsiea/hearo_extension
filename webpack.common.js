@@ -17,6 +17,7 @@ module.exports = {
     foreground: './src/content/foreground.js',
     settings_script: './src/popup_views/settings/settings-script.js',
     options: './src/options/options.js',
+    wrong_tab: './src/popup_views/wrong_tab/wrong_tab.js'
   },
   plugins: [
     new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
@@ -43,6 +44,11 @@ module.exports = {
       template: path.join(__dirname, "src", "popup_views", "settings", "settings.html"),
       filename: "settings.html",
       chunks: ["settings_script"] // This is script from entry point
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, "src", "popup_views", "wrong_tab", "wrong_tab.html"),
+      filename: "wrong_tab.html",
+      chunks: ["wrong_tab"] // This is script from entry point
     }),
     // Note: This is to copy any remaining files to bundler
     new CopyWebpackPlugin({
