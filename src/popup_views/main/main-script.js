@@ -15,7 +15,12 @@ const { initializeApp, applicationDefault, cert } = require('../firebase_config'
 const { getFirestore, Timestamp, FieldValue } = require('../firebase_config');
 import "firebase/database";
 
-
+var comment = ""
+var mess="";
+var limite = 10
+var numMess = 0
+var messageElement ="";
+var preced="";
 var userIsLoggedIn = false
 var podcastIsPlaying = false
 var startingTime = ''
@@ -32,17 +37,7 @@ var episodeTitle = ''
 var userID = ''
 const auth = getAuth(firebaseApp) // Auth instance for the current firebaseApp
 
-// try {
-//   const docRef = await addDoc(collection(db, 'users'), lastComment)
-//   console.log('Document written with ID: ', docRef.id)
-// } catch (e) {
-//   console.error('Error adding document: ', e)
-// }
 
-//  const querySnapshot = await getDocs(collection(db, episodeTitle))
-// querySnapshot.forEach(doc => {
-//   console.log(`${doc.id} => ${doc.data().name}`)
-// })
 
 chrome.runtime.connect({ name: 'main' })
 
@@ -685,8 +680,7 @@ const DB = [
   }
 ]
 
-var limite = 10
-var numMess = 0
+
 
 document.addEventListener('DOMContentLoaded', function () {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -744,84 +738,13 @@ document.addEventListener('DOMContentLoaded', function () {
     updateTimeCode(request.startingTime, request.endingTime)
     timecode = request.startingTime
     if (podcastIsPlaying == true) {
-      var preced
+      
 
-      var mess = testComment(timecode)
-      // console.log(mess.TimeCode)
-      const messageElement = document.createElement('div')
-      messageElement.id = numMess
-
-      var pri = 'Private'
-      console.log(mess.UUID)
-      if (mess.UUID == userid) {
-        numMess++
-        if (mess.Private == 0) {
-          pri = 'Public'
-        }
-        messageElement.innerHTML = `<div class="chat-message user-message">
-          <div class="chat-message-content">
-            <p class="chat-message-username"> <span class="pubpri">${pri}</span><span class="time">${mess.TimeCode}</span>${mess.UserName}</p>
-            <p class="chat-message-text">${mess.Comment}</p>
-          </div>
-        </div>
-        
-        `
-        const messagesContainer = document.querySelector('#messages')
-        messagesContainer.appendChild(messageElement)
-        preced = messagesContainer
-      } else {
-        numMess++
-        messageElement.innerHTML = ` <div class="chat-message">
-          <div class="chat-message-content">
-            <p class="chat-message-username">${mess.UserName}  <span class="time">${mess.TimeCode}</span> </p>
-            <p class="chat-message-text">${mess.Comment}</p>
-          </div>
-        </div>
-         `
-        const messagesContainer = document.querySelector('#messages')
-        messagesContainer.appendChild(messageElement)
-        preced = messagesContainer
-      }
-
-      messageElement.scrollIntoView({ behavior: 'smooth', block: 'end' })
-
-      //           var chatContainer = document.querySelector('.chat-container');
-      //           var isScrolledToBottom = chatContainer.scrollHeight - chatContainer.clientHeight <= chatContainer.scrollTop + 1;
-      //           chatContainer.appendChild(messageElement);
-      //           if(isScrolledToBottom) {
-      //           requestAnimationFrame(function(){
-      //             chatContainer.scrollTop = chatContainer.scrollHeight;
-      //             messageElement.scrollIntoView({behavior: "smooth", block: "end"});
-      //           });
-      // }
-
-      // var chatContainer = document.querySelector('.chat-container');
-      // var isScrolledToBottom = chatContainer.scrollHeight - chatContainer.clientHeight <= chatContainer.scrollTop + 1;
-      // chatContainer.appendChild(message);
-      // if(isScrolledToBottom) {
-      //   requestAnimationFrame(function(){
-      //   chatContainer.scrollTop = chatContainer.scrollHeight;
-      //   messageElement.scrollIntoView({behavior: "smooth", block: "end"});
-      //   });
-      // }
-
-      // var chatContainer = document.querySelector('.chat-container');
-      // var isScrolledToBottom = chatContainer.scrollHeight - chatContainer.clientHeight <= chatContainer.scrollTop + 1;
-      // chatContainer.appendChild(message);
-      // if(isScrolledToBottom) {
-      //   messagesContainer.scrollIntoView({behavior: "smooth", block: "end"});
-      //    chatContainer.scrollTop = chatContainer.scrollHeight ;
-
-      // }
-
-      // Check if message limit is exceeded
-      if (numMess > limite) {
-        const messagesToDelete = numMess - limite - 1
-
-        let myDiv = document.getElementById(messagesToDelete)
-        console.log(myDiv)
-        myDiv.parentNode.removeChild(myDiv)
-      }
+      getComments(timecode);
+      
+      
+      
+      
     }
   })
 })
@@ -857,7 +780,8 @@ document.querySelector('#publishBtn').addEventListener('click', () => {
 } catch (e) {
   console.error('Error adding document: ', e)
 }
-  console.log(DB)
+  testAff(lastComment)
+ 
 })
 
 function updateTimeCode (startingTime, endingTime) {
@@ -866,38 +790,104 @@ function updateTimeCode (startingTime, endingTime) {
 }
 
 
-function testComment (timecode, test) {
+
 
   
-//   const q = query(collection(db, episodeTitle))
-//   const querySnapshot = getDocs(q)
 
+const getComments = async (timecode) => {
 
-// querySnapshot.forEach((doc) => {
-//     // doc.data() is never undefined for query doc snapshots
-//     console.log(doc.id, " => ", doc.data());
-// });
-
-const querySnapshot =  getDocs(collection(db, episodeTitle));
-
-
-console.log("query")
-console.log(querySnapshot)
-querySnapshot.forEach((doc) => {
-  console.log(`${doc.id} => ${doc.data()}`);
-});
-
-
-  // if (doc.data.TimeCode + 1 <= timecode /*DB[com].podcast == podcastname*/) {
-  //   console.log(doc.data.TimeCode + 1)
-  //   return doc
-  // }
-
+  const querySnapshot = await getDocs(collection(db, episodeTitle));
+  querySnapshot.forEach(doc => {
+    if (doc.data().TimeCode  == timecode) {
+      
+        var preced
+        
+        var mess = doc.data()
   
+       
+        
+        
+        // console.log(mess.TimeCode)
+        const messageElement = document.createElement('div')
+        messageElement.id = numMess
+  
+        var pri = 'Private'
+        console.log(mess.UUID)
+        if (mess.UUID == userid) {
+          numMess++
+          if (mess.Private == 0) {
+            pri = 'Public'
+          }
+          messageElement.innerHTML = `<div class="chat-message user-message">
+            <div class="chat-message-content">
+              <p class="chat-message-username"> <span class="pubpri">${pri}</span><span class="time">${mess.TimeCode}</span>${mess.UserName}</p>
+              <p class="chat-message-text">${mess.Comment}</p>
+            </div>
+          </div>
+          
+          `
+          const messagesContainer = document.querySelector('#messages')
+          messagesContainer.appendChild(messageElement)
+          preced = messagesContainer
+        } else {
+          numMess++
+          messageElement.innerHTML = ` <div class="chat-message">
+            <div class="chat-message-content">
+              <p class="chat-message-username">${mess.UserName}  <span class="time">${mess.TimeCode}</span> </p>
+              <p class="chat-message-text">${mess.Comment}</p>
+            </div>
+          </div>
+           `
+          const messagesContainer = document.querySelector('#messages')
+          messagesContainer.appendChild(messageElement)
+          preced = messagesContainer
+        }
+  
+        messageElement.scrollIntoView({ behavior: 'smooth', block: 'end' })
+  
+        
+        if (numMess > limite) {
+          const messagesToDelete = numMess - limite - 1
+  
+          let myDiv = document.getElementById(messagesToDelete)
+          console.log(myDiv)
+          myDiv.parentNode.removeChild(myDiv)
+        }
+      
+    }
+   });
 }
+
+
+  
+
+  
+
 chrome.runtime.connect({ name: 'main' })
 
 function updtateEpisodeTitle (episodeTitle) {
   var myElement = document.getElementsByClassName('episodeTitle')[0]
   myElement.innerHTML = episodeTitle
+}
+
+
+function testAff(mess ){
+
+  messageElement = document.createElement('div');
+
+  var pri = "Private"
+  if(mess.Private == 0){
+    pri = "Public"
+  }
+  messageElement.innerHTML = `<div class="chat-message user-message">
+  <div class="chat-message-content">
+    <p class="chat-message-username"> <span class="pubpri">${pri}</span><span class="time">${mess.TimeCode}</span>${mess.UserName}</p>
+    <p class="chat-message-text">${mess.Comment}</p>
+  </div>
+</div>
+`;
+  const messagesContainer = document.querySelector('#messages');
+  messagesContainer.appendChild(messageElement);
+  preced = messagesContainer
+
 }
