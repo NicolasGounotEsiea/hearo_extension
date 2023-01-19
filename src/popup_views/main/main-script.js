@@ -923,3 +923,13 @@ function updtateEpisodeTitle(episodeTitle) {
   myElement.innerHTML = episodeTitle;
 }
 
+
+
+var button = document.getElementById("play_pause");
+button.addEventListener("click", function() {
+    if(button.getAttribute("class") === "play_pause myButton"){
+        button.setAttribute("class", "pause_play myButton");
+    }else {
+        button.setAttribute("class", "play_pause myButton");
+    }
+});
