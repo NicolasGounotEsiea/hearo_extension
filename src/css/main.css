@@ -14,18 +14,11 @@ body {
   justify-content: center;
   background: #9971FF;
   font-family: "Lato", sans-serif;
-  width: 300px;
+  width: 400px;
   height: 230px;
 }
 
 
-#btn_user_profile{
-  /* display: block; */
-  height: 30px;
-  width: 30px;
-  border-radius: 100%;
-  font-size: 18px;
-}
 
 
 .chat-message {
@@ -116,6 +109,20 @@ h3{
 }
 
 
+.player{
+  border-top: 1px solid rgb(255, 255, 255);
+  flex-direction: row;
+  overflow: hidden
+}
+
+.buttons{
+  display: flex;
+  float: left;
+  justify-content: flex-start;
+  width: 40%;
+  height: 80px;
+  align-items: center;
+}
 
 .minus_ten {
   width: 50px;
@@ -143,4 +150,25 @@ h3{
   background-repeat: no-repeat;
   background-position: center;
   border: 1px solid transparent
+}
+
+.informations{
+  display: flex; 
+  float: left;
+  flex-direction: column;
+  width: 60%;
+}
+.episodeTitle{
+  
+  font-size: 14px;
+  height: 50%;
+  color: #FFFFFF;
+  
+}
+
+.current_timecode{
+  font-size: 13px;
+
+  height: 50%;
+  color: #FFFFFF;
 }
