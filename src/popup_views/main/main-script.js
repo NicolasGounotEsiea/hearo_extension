@@ -9,6 +9,12 @@ var userid
 import { firebaseApp, db } from '../firebase_config'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { collection, addDoc, getDocs } from 'firebase/firestore'
+import * as firebase from "firebase/app";
+
+const { initializeApp, applicationDefault, cert } = require('../firebase_config');
+const { getFirestore, Timestamp, FieldValue } = require('../firebase_config');
+import "firebase/database";
+
 
 var userIsLoggedIn = false
 var podcastIsPlaying = false
@@ -26,17 +32,17 @@ var episodeTitle = ''
 var userID = ''
 const auth = getAuth(firebaseApp) // Auth instance for the current firebaseApp
 
-try {
-  const docRef = await addDoc(collection(db, 'users'), lastComment)
-  console.log('Document written with ID: ', docRef.id)
-} catch (e) {
-  console.error('Error adding document: ', e)
-}
+// try {
+//   const docRef = await addDoc(collection(db, 'users'), lastComment)
+//   console.log('Document written with ID: ', docRef.id)
+// } catch (e) {
+//   console.error('Error adding document: ', e)
+// }
 
-const querySnapshot = await getDocs(collection(db, 'users'))
-querySnapshot.forEach(doc => {
-  console.log(`${doc.id} => ${doc.data().name}`)
-})
+//  const querySnapshot = await getDocs(collection(db, episodeTitle))
+// querySnapshot.forEach(doc => {
+//   console.log(`${doc.id} => ${doc.data().name}`)
+// })
 
 chrome.runtime.connect({ name: 'main' })
 
@@ -844,6 +850,13 @@ document.querySelector('#publishBtn').addEventListener('click', () => {
   console.log('SUBMIT : ', lastComment)
 
   DB.unshift(lastComment)
+
+  try {
+  const docRef =  addDoc(collection(db, episodeTitle), lastComment)
+  console.log('Document written with ID: ', docRef.id)
+} catch (e) {
+  console.error('Error adding document: ', e)
+}
   console.log(DB)
 })
 
@@ -852,13 +865,35 @@ function updateTimeCode (startingTime, endingTime) {
   myElement.innerHTML = startingTime + ' / ' + endingTime
 }
 
-function testComment (timecode) {
-  for (var com = 0; com < DB.length; com++) {
-    if (DB[com].TimeCode + 1 <= timecode /*DB[com].podcast == podcastname*/) {
-      console.log(DB[com].TimeCode + 1)
-      return DB[com]
-    }
-  }
+
+function testComment (timecode, test) {
+
+  
+//   const q = query(collection(db, episodeTitle))
+//   const querySnapshot = getDocs(q)
+
+
+// querySnapshot.forEach((doc) => {
+//     // doc.data() is never undefined for query doc snapshots
+//     console.log(doc.id, " => ", doc.data());
+// });
+
+const querySnapshot =  getDocs(collection(db, episodeTitle));
+
+
+console.log("query")
+console.log(querySnapshot)
+querySnapshot.forEach((doc) => {
+  console.log(`${doc.id} => ${doc.data()}`);
+});
+
+
+  // if (doc.data.TimeCode + 1 <= timecode /*DB[com].podcast == podcastname*/) {
+  //   console.log(doc.data.TimeCode + 1)
+  //   return doc
+  // }
+
+  
 }
 chrome.runtime.connect({ name: 'main' })
 
