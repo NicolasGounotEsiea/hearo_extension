@@ -1,12 +1,5 @@
 
 
-#btn_user_profile{
-  /* display: block; */
-  height: 30px;
-  width: 30px;
-  border-radius: 100%;
-  font-size: 18px;
-}
 body {
   position: inherit;
   display: block;
@@ -14,19 +7,301 @@ body {
   justify-content: center;
   background: #9971FF;
   font-family: "Lato", sans-serif;
-  width: 300px;
+  width: 400px;
   height: 230px;
 }
 
 
 #btn_user_profile{
   /* display: block; */
-  height: 30px;
-  width: 30px;
+  position: relative;
+  margin-right: -30px;
+  height: 20px;
+  width: 20px;
   border-radius: 100%;
-  font-size: 18px;
+  font-size: 10px;
+  top: 2px;
+  bottom: -8px;
+  border: 1px transparent;
+  margin-left: 100px;
+  /* display: inline-flex;
+  flex-direction: column; */
+  /* display: inline-block; */
+  background-color: white;
+  /* padding: 20px; */
+  color: #9971FF;
+  text-align: center;
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  border: 1px transparent;
+  border-color: #ffffff;
+  font-size: 9px;
 }
 
+.chat-message {
+  display: flex;
+  align-items: flex-start;
+  padding: 5px;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  background-color: #f5f5f5;
+}
+
+.chat-message-content {
+  flex-grow: 1;
+}
+
+.chat-message-username {
+  font-weight: bold;
+  margin-bottom: 2px;
+  margin-top: 2px;
+
+  
+}
+
+.chat-message-text {
+  color: #333;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+
+.user-message {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+.user-message .chat-message-content {
+  text-align: right;
+}
+
+.user-message .chat-message-username {
+  margin-left: 10px;
+}
+
+.chat-message-username .time {
+  font-weight: normal;
+  font-size: smaller;
+  color: gray;
+  margin-right: 4px;
+  margin-left: 4px;
+}
+
+.chat-message-username .pubpri {
+  font-weight: normal;
+  font-size: smaller;
+  margin-right: 4px;
+ 
+}
+
+
+h3{
+  position: absolute;
+  width: 37px;
+  height: 12px;
+  left: calc(50% - 37px/2);
+  top: 5px;
+
+  font-family: Helvetica;
+  font-style: normal;
+  font-weight: 900;
+  font-size: 10px;
+  line-height: 12px;
+  /* identical to box height */
+
+  display: flex;
+  align-items: center;
+  text-align: center;
+  letter-spacing: 0.10em;
+
+  color: #FFFFFF;
+
+}
+
+.player{
+  border-top: 1px solid rgb(255, 255, 255);
+  flex-direction: row;
+  overflow: hidden
+}
+
+.buttons{
+  display: flex;
+  float: left;
+  justify-content: flex-start;
+  width: 40%;
+  height: 80px;
+  align-items: center;
+}
+
+.minus_ten {
+  width: 50px;
+  height: 50px;
+  background-color: rgba(255, 255, 255, 0); 
+  background-image: url(../icons/minus10.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  border: 1px solid transparent
+}
+.play_pause {
+  width: 50px;
+  height: 50px;
+  background-color: rgba(255, 255, 255, 0); 
+  background-image: url(../icons/play.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  border: 1px solid transparent
+}
+
+
+.pause_play {
+    width: 50px;
+    height: 50px;
+    background-color: rgba(255, 255, 255, 0); 
+    background-image: url(../icons/pause.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    border: 1px solid transparent
+}
+.plus_thirty {
+  width: 50px;
+  height: 50px;
+  background-color: rgba(255, 255, 255, 0); 
+  background-image: url(../icons/plus30.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  border: 1px solid transparent
+}
+
+.informations{
+  display: flex; 
+  float: left;
+  flex-direction: column;
+  width: 60%;
+}
+.episodeTitle{
+  
+  font-size: 14px;
+  height: 50%;
+  color: #FFFFFF;
+  
+}
+
+.current_timecode{
+  font-size: 13px;
+
+  height: 50%;
+  color: #FFFFFF;
+}
+
+
+.myButton {
+ 
+  transition: transform 0.1s;
+}
+
+
+
+
+.myButton:active {
+  transform: scale(0.95);
+}
+
+.highlight {
+  background-color: yellow;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 30px;
+  height: 17px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 17px;
+  width: 17px;
+
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(13px);
+  -ms-transform: translateX(13px);
+  transform: translateX(13px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+#text_field{
+  height: 20px;
+  width: 216px;
+  border: 1px transparent;
+  background: #FFFFFF;
+  left: 8px;
+  top: 271px;
+  margin-left: 10px;
+  /* Background */
+  box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.16);
+  border-radius: 4px;
+}
+
+#publishBtn{
+  border-radius: 5px;
+  font-family: "Cambria";
+  justify-content: center;
+  border: 1px transparent;
+  background-color: white;
+  height: 21px;
+  width: 54px;
+  left: 231px;
+  top: 271px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 12px;
+  letter-spacing: 0em;
+  text-align: center;
+}
 
 .chat-message {
   display: flex;
@@ -89,28 +364,41 @@ body {
 
 .chat-container {
   height: 300px;
-  overflow-y:auto;}
+  overflow-y:auto;
+}
 
 
-h3{
-  position: absolute;
-  width: 37px;
-  height: 12px;
-  left: calc(50% - 37px/2);
-  top: 5px;
-
+.text-center{
+  position: relative;
+  width: 291px;
+  height: 0px;
+  left: calc(30% - 10px/2);
+  margin-left: 40px;
+  top: 4px;
+  bottom: -8px;
   font-family: Helvetica;
   font-style: normal;
   font-weight: 900;
   font-size: 10px;
-  line-height: 12px;
-  /* identical to box height */
-
+  line-height: 0px;
+  
   display: flex;
   align-items: center;
   text-align: center;
   letter-spacing: 0.10em;
-
   color: #FFFFFF;
+}
 
+.container{
+  position: relative;
+  width: 330px;
+  height: 22px;
+  top: 0px;
+}
+
+.commentbox{
+  position: relative;
+  top: -5px;
+  border-radius: 20px;
+  border: 1px transparent;
 }

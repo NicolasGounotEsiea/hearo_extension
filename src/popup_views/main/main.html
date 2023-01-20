@@ -1,55 +1,64 @@
 <!DOCTYPE html>
+
 <head>
   <meta charset=utf-8 />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Main</title>
   <link rel="stylesheet" href="./src/css/main.css">
-
 </head>
-<div class="container" >
-    
-  <h3 class="text-center">
-      HEARO
-  </h3> 
-  <br>
-  <br>
+<div class="container">
+  <div class="text-center">
+    HEARO
+    <button id="btn_user_profile">P</button>
+  </div>
 </div>
 
 
-
 <body>
-
   <div class="chat-container" id="messages">
 
-  </div>
 
+  </div>
+  
   <input type="text" id="text_field" placeholder="J'écris mon commentaire ici...">
   <button id="publishBtn">Publier</button>
 
 
   
-  <div class="heading">
- 
-    <button id="btn_user_profile">P</button>
+  <p>Public
+  <p>
+    <label class="switch">
+      <input type="checkbox" data-toggle="1" value="0" id="private">
+      <span class="slider round"></span>
+    </label>
 
+  <div class="player">
 
-    
+    <div class="buttons">
+      <button class="minus_ten myButton" id="minus_ten"></button>
+      <button class="play_pause myButton" id="play_pause"></button>
+      <button class="plus_thirty myButton" id="plus_thirty"></button>
+    </div>
 
-    <button id="minus_ten">- 10scd</button>
-    <button id="play_pause">Play/pause</button>
-    <button id="plus_thirty">+ 30scd</button>
-    
+    <div class="informations">
+      <h1 class="episodeTitle">Vous devez lancer un épisode pour pouvoir utiliser l'extension</h1>
+      <h1 class="current_timecode" id="current_timecode">xx:xx</h1>
+    </div>
+
   </div>
+<!-- <<<<<<< wrong_page -->
   
 
   
 
-  <h1 class="current_timecode"></h1>
+<!--   <h1 class="current_timecode"></h1> -->
 
 
 
   
-  <h1 class="episodeTitle">Vous devez lancer un épisode pour pouvoir utiliser l'extension</h1>
+<!--   <h1 class="episodeTitle">Vous devez lancer un épisode pour pouvoir utiliser l'extension</h1> -->
+<!-- ======= -->
+<!-- >>>>>>> development -->
 </body>
 
 </html>
