@@ -114,6 +114,12 @@ h3{
   color: #FFFFFF;
 
 }
+
+
+.highlight {
+  background-color: yellow;
+}
+
 .switch {
   position: relative;
   display: inline-block;
