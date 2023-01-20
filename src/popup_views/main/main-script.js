@@ -26,6 +26,7 @@ var userIsLoggedIn = false
 var podcastIsPlaying = false
 var startingTime = ''
 var endingTime = ''
+var username = ''
 
 var lastComment = { //objet commentaire
   podcastEpisode: {},
@@ -50,6 +51,7 @@ onAuthStateChanged(auth, user => {
     console.log(user)
     userid = user.uid
     userID = userid
+    username = user.displayName;
 
     userIsLoggedIn = true
     console.log('Below User is logged in : ', user)
@@ -151,14 +153,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 document.querySelector('#publishBtn').addEventListener('click', () => {
   lastComment.podcast = episodeTitle
   lastComment.TimeCode = startingTime
-  lastComment.UserName = 'nico'
+  lastComment.UserName = username
   lastComment.UUID = userID
   lastComment.Comment = document.getElementById('text_field').value
 
   document.getElementById('text_field').value = ''
   console.log('SUBMIT : ', lastComment)
-
-  DB.unshift(lastComment)
 
   try {
   const docRef =  addDoc(collection(db, episodeTitle), lastComment)
