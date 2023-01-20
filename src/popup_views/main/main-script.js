@@ -137,8 +137,10 @@ document.addEventListener('DOMContentLoaded', function () {
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.podcastIsPlaying) {
     podcastIsPlaying = true
+    update_PlayPause();
   } else {
     podcastIsPlaying = false
+    update_PlayPause();
   }
   startingTime = request.startingTime
   endingTime = request.endingTime
@@ -286,7 +288,7 @@ function response () {
   }
 }
 
-function update_PlayPause () {
+function update_PlayPause() {
   var button = document.getElementById('play_pause')
   if (podcastIsPlaying == false) {
     button.setAttribute('class', 'play_pause myButton')
@@ -296,6 +298,8 @@ function update_PlayPause () {
 }
 
 chrome.runtime.connect({ name: 'main' })
+
+update_PlayPause();
 
 
 // SEPARATION
