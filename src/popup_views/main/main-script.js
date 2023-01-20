@@ -9,26 +9,31 @@ var userid
 import { firebaseApp, db } from '../firebase_config'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { collection, addDoc, getDocs } from 'firebase/firestore'
-import * as firebase from "firebase/app";
+import * as firebase from 'firebase/app'
 
-const { initializeApp, applicationDefault, cert } = require('../firebase_config');
-const { getFirestore, Timestamp, FieldValue } = require('../firebase_config');
-import "firebase/database";
+const {
+  initializeApp,
+  applicationDefault,
+  cert
+} = require('../firebase_config')
+const { getFirestore, Timestamp, FieldValue } = require('../firebase_config')
+import 'firebase/database'
 
 //VARIABLES GLOBALES
-var comment = ""
-var mess="";
+var comment = ''
+var mess = ''
 var limite = 10 //limite de message du chat
 var numMess = 0 //nombre de messages affichés depuis le début
-var messageElement =""; //élément injecter pour afficher le commentaire
-var preced=""; //div du message precedent 
+var messageElement = '' //élément injecter pour afficher le commentaire
+var preced = '' //div du message precedent
 var userIsLoggedIn = false
 var podcastIsPlaying = false
 var startingTime = ''
 var endingTime = ''
 var username = ''
 
-var lastComment = { //objet commentaire
+var lastComment = {
+  //objet commentaire
   podcastEpisode: {},
   TimeCode: '',
   UserName: '',
@@ -41,8 +46,6 @@ var episodeTitle = ''
 var userID = ''
 const auth = getAuth(firebaseApp) // Auth instance for the current firebaseApp
 
-
-
 chrome.runtime.connect({ name: 'main' })
 
 onAuthStateChanged(auth, user => {
@@ -51,7 +54,7 @@ onAuthStateChanged(auth, user => {
     console.log(user)
     userid = user.uid
     userID = userid
-    username = user.displayName;
+    username = user.displayName
 
     userIsLoggedIn = true
     console.log('Below User is logged in : ', user)
@@ -69,8 +72,6 @@ onAuthStateChanged(auth, user => {
     })
   })
 })
-
-
 
 document.addEventListener('DOMContentLoaded', function () {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -128,11 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
     updateTimeCode(request.startingTime, request.endingTime)
     timecode = request.startingTime
     if (podcastIsPlaying == true) {
-      
-
-      getComments(timecode);
-      
-      
+      getComments(timecode)
     }
   })
 })
@@ -157,17 +154,22 @@ document.querySelector('#publishBtn').addEventListener('click', () => {
   lastComment.UUID = userID
   lastComment.Comment = document.getElementById('text_field').value
 
-  document.getElementById('text_field').value = ''
-  console.log('SUBMIT : ', lastComment)
-
-  try {
-  const docRef =  addDoc(collection(db, episodeTitle), lastComment)
-  console.log('Document written with ID: ', docRef.id)
-} catch (e) {
-  console.error('Error adding document: ', e)
-}
-  testAff(lastComment)
- 
+  if(lastComment.Comment.length === 0){
+    document.getElementById("text_field").placeholder = "Entrez un commentaire valide"
+    document.getElementById("text_field").style.setProperty('color', 'white', 'important');
+    document.getElementById("text_field").style.setProperty('background-color', 'pink', 'important'); 
+  } else {
+    document.getElementById('text_field').value = ''
+    console.log('SUBMIT : ', lastComment)
+  
+    try {
+      const docRef = addDoc(collection(db, episodeTitle), lastComment)
+      console.log('Document written with ID: ', docRef.id)
+    } catch (e) {
+      console.error('Error adding document: ', e)
+    }
+    testAff(lastComment)
+  }
 })
 
 function updateTimeCode (startingTime, endingTime) {
@@ -176,18 +178,16 @@ function updateTimeCode (startingTime, endingTime) {
 }
 
 //fonction d'affichage des comentaires
-const getComments = async (timecode) => {
-
-  const querySnapshot = await getDocs(collection(db, episodeTitle));// récupération depuis firestore
+const getComments = async timecode => {
+  const querySnapshot = await getDocs(collection(db, episodeTitle)) // récupération depuis firestore
   querySnapshot.forEach(doc => {
-    if (doc.data().TimeCode  == timecode) {
-      
+    if (doc.data().TimeCode == timecode) {
       var preced
       var mess = doc.data()
 
       const messageElement = document.createElement('div')
       messageElement.id = numMess
-  
+
       var pri = 'Private'
       console.log(mess.UUID)
       if (mess.UUID == userid) {
@@ -206,7 +206,7 @@ const getComments = async (timecode) => {
         const messagesContainer = document.querySelector('#messages')
         messagesContainer.appendChild(messageElement)
         preced = messagesContainer
-      } else if (mess.Private == 0){
+      } else if (mess.Private == 0) {
         numMess++
         messageElement.innerHTML = ` <div class="chat-message">
             <div class="chat-message-content">
@@ -219,22 +219,32 @@ const getComments = async (timecode) => {
         messagesContainer.appendChild(messageElement)
         preced = messagesContainer
       }
-  
+
       messageElement.scrollIntoView({ behavior: 'smooth', block: 'end' })
-        
+
       response()
 
-        
-      if (numMess > limite) { //limiter le nombre de messages dans le chat
+      if (numMess > limite) {
+        //limiter le nombre de messages dans le chat
         const messagesToDelete = numMess - limite - 1
-  
+
         let myDiv = document.getElementById(messagesToDelete)
         console.log(myDiv)
         myDiv.parentNode.removeChild(myDiv)
       }
-      
     }
-  });
+  })
+
+  var badWords = ["pute","paul","test"];
+  var phrase = lastComment.Comment;
+  for(let i = 0; i < badWords.length; i++){
+    var regex = new RegExp(badWords[i], "gi");
+    phrase = phrase.replace(regex, "***");
+  }
+  console.log("Phrase modifiée : " + phrase);
+  lastComment.Comment = phrase
+  document.getElementById("text_field").value = "";
+  console.log("SUBMIT : ", lastComment);
 }
 
 
@@ -243,14 +253,14 @@ function updtateEpisodeTitle (episodeTitle) {
   myElement.innerHTML = episodeTitle
 }
 
+function testAff (mess) {
+  //juste une fonction d'injection de commentaire qu'il faut que je renomme
 
-function testAff(mess ){ //juste une fonction d'injection de commentaire qu'il faut que je renomme
+  messageElement = document.createElement('div')
 
-  messageElement = document.createElement('div');
-
-  var pri = "Private"
-  if(mess.Private == 0){
-    pri = "Public"
+  var pri = 'Private'
+  if (mess.Private == 0) {
+    pri = 'Public'
   }
   messageElement.innerHTML = `<div class="chat-message user-message">
   <div class="chat-message-content">
@@ -258,21 +268,31 @@ function testAff(mess ){ //juste une fonction d'injection de commentaire qu'il f
     <p class="chat-message-text">${mess.Comment}</p>
   </div>
   </div>
-  `;
-  const messagesContainer = document.querySelector('#messages');
-  messagesContainer.appendChild(messageElement);
+  `
+  const messagesContainer = document.querySelector('#messages')
+  messagesContainer.appendChild(messageElement)
   preced = messagesContainer
   response()
-
 }
 
-
-function response(){ //surligne les réponses utilisateurs ("@...")
-  let elements = document.querySelectorAll("p, span");
+function response () {
+  //surligne les réponses utilisateurs ("@...")
+  let elements = document.querySelectorAll('p, span')
   for (let i = 0; i < elements.length; i++) {
-     elements[i].innerHTML = elements[i].innerHTML.replace(/\S*@\S*/g, "<mark>$&</mark>");
+    elements[i].innerHTML = elements[i].innerHTML.replace(
+      /\S*@\S*/g,
+      '<mark>$&</mark>'
+    )
   }
 }
 
+function update_PlayPause () {
+  var button = document.getElementById('play_pause')
+  if (podcastIsPlaying == false) {
+    button.setAttribute('class', 'play_pause myButton')
+  } else {
+    button.setAttribute('class', 'pause_play myButton')
+  }
+}
 
 chrome.runtime.connect({ name: 'main' })
