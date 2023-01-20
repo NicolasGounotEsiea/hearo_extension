@@ -10,7 +10,7 @@ import { firebaseApp } from '../firebase_config'
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 var userIsLoggedIn = false;
-var podcastIsPlaying = false;
+var podcastIsPlaying;
 var startingTime = "";
 var endingTime = "";
 var lastComment = {
@@ -743,6 +743,7 @@ document.addEventListener("DOMContentLoaded", function() {
         
       } else {
         podcastIsPlaying = false;
+
     
         // console.log("avant modif:",document.getElementById("play_pause").style.backgroundImage)
         
@@ -750,7 +751,14 @@ document.addEventListener("DOMContentLoaded", function() {
         
         // console.log("après modif:",document.getElementById("play_pause").style.backgroundImage)
         
+
+        
+
       }
+
+      update_PlayPause()
+
+      
       updateTimeCode(request.startingTime, request.endingTime);
       timecode = request.startingTime
       if(podcastIsPlaying == true){
@@ -885,14 +893,39 @@ document.querySelector('#publishBtn').addEventListener("click", () => {
   lastComment.TimeCode = startingTime;
   lastComment.UserName = "nico";
   lastComment.UUID = userID;
+
+
   lastComment.Comment = document.getElementById("text_field").value;
-  
-  
-  
+
+  if(lastComment.Comment.length === 0){
+    document.getElementById("text_field").placeholder = "Entrez un commentaire valide"
+    document.getElementById("text_field").style.setProperty('color', 'white', 'important');
+    document.getElementById("text_field").style.setProperty('background-color', 'pink', 'important');
+    
+  }
+
+  else{
+
+
+  var badWords = ["pute","paul","test"];
+  var phrase = lastComment.Comment;
+  for(let i = 0; i < badWords.length; i++){
+    var regex = new RegExp(badWords[i], "gi");
+    phrase = phrase.replace(regex, "***");
+  }
+  console.log("Phrase modifiée : " + phrase);
+  lastComment.Comment = phrase
   document.getElementById("text_field").value = "";
   console.log("SUBMIT : ", lastComment);
 
   DB.unshift(lastComment)
+  
+}
+
+  
+  
+  
+  
   console.log(DB)
 
 
@@ -907,7 +940,7 @@ function updateTimeCode(startingTime, endingTime) {
 
 function testComment(timecode){
   for(var com = 0; com < DB.length ; com ++){
-    if(DB[com].TimeCode + 1<= timecode  /*DB[com].podcast == podcastname*/ ){
+    if(DB[com].TimeCode == timecode  /*DB[com].podcast == podcastname*/ ){
       console.log(DB[com].TimeCode + 1)
       return DB[com]
     }
@@ -924,12 +957,15 @@ function updtateEpisodeTitle(episodeTitle) {
 }
 
 
+function update_PlayPause(){
 
-var button = document.getElementById("play_pause");
-button.addEventListener("click", function() {
-    if(button.getAttribute("class") === "play_pause myButton"){
-        button.setAttribute("class", "pause_play myButton");
-    }else {
-        button.setAttribute("class", "play_pause myButton");
-    }
-});
+  var button = document.getElementById("play_pause");
+        if(podcastIsPlaying == false){
+          button.setAttribute("class","play_pause myButton" );
+        }else {
+          button.setAttribute("class", "pause_play myButton");
+        }
+
+}
+
+update_PlayPause()

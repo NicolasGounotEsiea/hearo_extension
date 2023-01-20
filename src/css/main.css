@@ -186,16 +186,12 @@ h3{
 
 
 .myButton {
-  
-  color: white;
  
   transition: transform 0.1s;
 }
 
 
-button:active {
-  background-color: rgba(183, 183, 183, 0.344);
-}
+
 
 .myButton:active {
   transform: scale(0.95);
