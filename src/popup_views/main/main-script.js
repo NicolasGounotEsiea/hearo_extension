@@ -130,6 +130,8 @@ document.addEventListener('DOMContentLoaded', function () {
     timecode = request.startingTime
     if (podcastIsPlaying == true) {
       getComments(timecode)
+      
+      
     }
   })
 })
@@ -147,6 +149,16 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   episodeTitle = request.episodeTitle
   updateTimeCode(startingTime, endingTime)
   updtateEpisodeTitle(episodeTitle)
+
+
+  if (numMess > limite) {
+        //limiter le nombre de messages dans le chat
+        const messagesToDelete = numMess - limite - 1
+
+        let myDiv = document.getElementById(messagesToDelete)
+        console.log(myDiv)
+        myDiv.parentNode.removeChild(myDiv)
+      }
 })
 
 document.querySelector('#publishBtn').addEventListener('click', () => {
@@ -155,12 +167,26 @@ document.querySelector('#publishBtn').addEventListener('click', () => {
   lastComment.UserName = username
   lastComment.UUID = userID
   lastComment.Comment = document.getElementById('text_field').value
+  
 
   if(lastComment.Comment.length === 0){
     document.getElementById("text_field").placeholder = "Entrez un commentaire valide"
     document.getElementById("text_field").style.setProperty('color', 'white', 'important');
     document.getElementById("text_field").style.setProperty('background-color', 'pink', 'important'); 
   } else {
+    var badWords = ["pute","paul","test"];
+  var phrase = lastComment.Comment;
+  for(let i = 0; i < badWords.length; i++){
+    var regex = new RegExp(badWords[i], "gi");
+    phrase = phrase.replace(regex, "***");
+  }
+  console.log("Phrase modifiée : " + phrase);
+  lastComment.Comment = phrase
+  document.getElementById("text_field").value = "";
+  console.log("SUBMIT : ", lastComment);
+
+
+  
     document.getElementById('text_field').value = ''
     console.log('SUBMIT : ', lastComment)
   
@@ -171,6 +197,7 @@ document.querySelector('#publishBtn').addEventListener('click', () => {
       console.error('Error adding document: ', e)
     }
     testAff(lastComment)
+    
   }
 })
 
@@ -226,27 +253,17 @@ const getComments = async timecode => {
 
       response()
 
-      if (numMess > limite) {
-        //limiter le nombre de messages dans le chat
-        const messagesToDelete = numMess - limite - 1
+      
 
-        let myDiv = document.getElementById(messagesToDelete)
-        console.log(myDiv)
-        myDiv.parentNode.removeChild(myDiv)
-      }
+      
     }
   })
 
-  var badWords = ["pute","paul","test"];
-  var phrase = lastComment.Comment;
-  for(let i = 0; i < badWords.length; i++){
-    var regex = new RegExp(badWords[i], "gi");
-    phrase = phrase.replace(regex, "***");
-  }
-  console.log("Phrase modifiée : " + phrase);
-  lastComment.Comment = phrase
-  document.getElementById("text_field").value = "";
-  console.log("SUBMIT : ", lastComment);
+
+  
+
+
+ 
 }
 
 
@@ -271,13 +288,28 @@ function testAff (mess) {
   </div>
   </div>
   `
+  numMess++
   const messagesContainer = document.querySelector('#messages')
   messagesContainer.appendChild(messageElement)
   preced = messagesContainer
+
+  if (numMess > limite) {
+        //limiter le nombre de messages dans le chat
+        const messagesToDelete = numMess - limite - 1
+
+        let myDiv = document.getElementById(messagesToDelete)
+        console.log(myDiv)
+        myDiv.parentNode.removeChild(myDiv)
+      }
+
+
   response()
+  
+
+  
 }
 
-function response () {
+function response() {
   //surligne les réponses utilisateurs ("@...")
   let elements = document.querySelectorAll('p, span')
   for (let i = 0; i < elements.length; i++) {
@@ -312,6 +344,15 @@ chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
   }
   // use `url` here inside the callback because it's asynchronous!
 }); 
+
+// function scrollText() {
+//   var text = document.getElementById("def");
+//   text.style.marginLeft = "100%";
+//   setTimeout(scrollText, 50);
+// }
+// scrollText();
+
+
 
 
 // SEPARATION
