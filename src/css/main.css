@@ -219,6 +219,7 @@ h3{
   display: inline-block;
   width: 30px;
   height: 17px;
+  left: 20px;
 }
 
 .switch input { 
@@ -403,3 +404,6 @@ input:checked + .slider:before {
   border: 1px transparent;
 }
 
+.private{
+  margin-left: 200px;
+}
