@@ -251,8 +251,21 @@ const getComments = async timecode => {
         }
         messageElement.innerHTML = `<div class="chat-message user-message">
             <div class="chat-message-content">
+            
               <p class="chat-message-username"> <span class="pubpri">${pri}</span><span class="time">${mess.TimeCode}</span>${mess.UserName}</p>
               <p class="chat-message-text">${mess.Comment}</p>
+              <div class="container-mod">
+  <div class="item">
+   
+    <div class="options-container">
+        <button class="options-button"><i class="fas fa-ellipsis-v"></i>...</button>
+        <div class="options">
+            <button class="edit">  <i class="fas fa-edit"></i> Modifier</button>
+            <button class="delete">  <i class="fas fa-trash"></i> Supprimer</button>
+        </div>
+    </div>
+  </div>
+</div>
             </div>
           </div>
           
@@ -264,8 +277,21 @@ const getComments = async timecode => {
         numMess++
         messageElement.innerHTML = ` <div class="chat-message">
             <div class="chat-message-content">
+            
               <p class="chat-message-username">${mess.UserName}  <span class="time">${mess.TimeCode}</span> </p>
               <p class="chat-message-text">${mess.Comment}</p>
+              <div class="container-mod">
+              <div class="item">
+               
+                <div class="options-container">
+                    <button class="options-button"><i class="fas fa-ellipsis-v"></i>...</button>
+                    <div class="options">
+                        <button class="edit">  <i class="fas fa-edit"></i> Modifier</button>
+                        <button class="delete">  <i class="fas fa-trash"></i> Supprimer</button>
+                    </div>
+                </div>
+              </div>
+            </div>
             </div>
           </div>
            `
@@ -278,9 +304,15 @@ const getComments = async timecode => {
 
       response()
 
-      
+      if (numMess > limite){
+        //limiter le nombre de messages dans le chat
+        const messagesToDelete = numMess - limite - 1
+     
+        let myDiv = document.getElementById(messagesToDelete)
+        console.log(myDiv)
+        myDiv.parentNode.removeChild(myDiv)
+        }
 
-      
     }
   }) 
 }
@@ -301,9 +333,23 @@ function testAff (mess) {
     pri = 'Public'
   }
   messageElement.innerHTML = `<div class="chat-message user-message">
+  
   <div class="chat-message-content">
-    <p class="chat-message-username"> <span class="pubpri">${pri}</span><span class="time">${mess.TimeCode}</span>${mess.UserName}</p>
+  
+    <p class="chat-message-username">  <span class="pubpri">${pri}</span><span class="time">${mess.TimeCode}</span>${mess.UserName}</p>
     <p class="chat-message-text">${mess.Comment}</p>
+    <div class="container-mod">
+  <div class="item">
+   
+    <div class="options-container">
+        <button class="options-button"><i class="fas fa-ellipsis-v"></i>...</button>
+        <div class="options">
+            <button class="edit">  <i class="fas fa-edit"></i> Modifier</button>
+            <button class="delete">  <i class="fas fa-trash"></i> Supprimer</button>
+        </div>
+    </div>
+  </div>
+</div>
   </div>
   </div>
   `
