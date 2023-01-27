@@ -28,7 +28,7 @@ body {
   bottom: -8px;
   border: 1px transparent;
 
-  margin-left: 160px;
+  margin-left: 155px;
   background-color: white;
   /* padding: 20px; */
   color: #9971FF;
@@ -376,7 +376,7 @@ input:checked + .slider:before {
   width: 291px;
   height: 0px;
   left: calc(30% - 10px/2);
-  margin-left: 40px;
+  margin-left: 50px;
   top: 4px;
   bottom: -8px;
   font-family: Helvetica;
