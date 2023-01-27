@@ -192,7 +192,7 @@ document.querySelector('#publishBtn').addEventListener('click', () => {
   } else {
 
     document.getElementById("text_field").placeholder = " votre commentaire"
-    
+    document.getElementById("text_field").style.setProperty('color', 'black');
     document.getElementById("text_field").style.setProperty('background-color', 'white');
     var badWords = ["pute","paul","test"];
   var phrase = lastComment.Comment;

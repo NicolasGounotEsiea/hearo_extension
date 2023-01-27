@@ -468,3 +468,7 @@ input:checked + .slider:before {
 .edit span, .delete span {
   font-size:14px;
 }
+
+.options-button:active {
+  transform: scale(0.87);
+}
