@@ -1,21 +1,19 @@
-
-
 body {
   position: inherit;
   display: block;
   flex-direction: column;
   justify-content: center;
   background: #9971FF;
-  font-family: "Lato", sans-serif;
-  width: 400px;
-  height: 230px;
+  font-family: Helvetica;
+  width: 361px;
+  height: 291px;
 }
 
 
 #btn_user_profile{
   /* display: block; */
   position: relative;
-  margin-right: -30px;
+  /* margin-right: -50px; */
   height: 20px;
   width: 20px;
   border-radius: 100%;
@@ -23,12 +21,8 @@ body {
   top: 2px;
   bottom: -8px;
   border: 1px transparent;
-  margin-left: 100px;
-  /* display: inline-flex;
-  flex-direction: column; */
-  /* display: inline-block; */
+  margin-left: 120px;
   background-color: white;
-  /* padding: 20px; */
   color: #9971FF;
   text-align: center;
   height: 18px;
@@ -55,9 +49,7 @@ body {
 .chat-message-username {
   font-weight: bold;
   margin-bottom: 2px;
-  margin-top: 2px;
-
-  
+  margin-top: 2px;  
 }
 
 .chat-message-text {
@@ -138,42 +130,36 @@ h3{
 }
 
 .minus_ten {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   background-color: rgba(255, 255, 255, 0); 
   background-image: url(../icons/minus10.png);
   background-repeat: no-repeat;
   background-position: center;
-  border: 1px solid transparent
+  border: 1px solid transparent;
+  border-radius: 50%;
 }
 .play_pause {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   background-color: rgba(255, 255, 255, 0); 
   background-image: url(../icons/play.png);
   background-repeat: no-repeat;
   background-position: center;
-  border: 1px solid transparent
+  border: 1px solid transparent;
+  border-radius: 50%;
 }
 
 
-.pause_play {
-    width: 50px;
-    height: 50px;
-    background-color: rgba(255, 255, 255, 0); 
-    background-image: url(../icons/pause.png);
-    background-repeat: no-repeat;
-    background-position: center;
-    border: 1px solid transparent
-}
 .plus_thirty {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   background-color: rgba(255, 255, 255, 0); 
   background-image: url(../icons/plus30.png);
   background-repeat: no-repeat;
   background-position: center;
-  border: 1px solid transparent
+  border: 1px solid transparent;
+  border-radius: 50%;
 }
 
 .informations{
@@ -183,16 +169,18 @@ h3{
   width: 60%;
 }
 .episodeTitle{
-  
-  font-size: 14px;
+  font-size: 15px;
+  font-family: Helvetica;
   height: 50%;
   color: #FFFFFF;
+  /* margin-left: 20px; */
+  margin-right: 10px;
   
 }
 
 .current_timecode{
-  font-size: 13px;
-
+  margin-left: 20px;
+  font-size: 14px;
   height: 50%;
   color: #FFFFFF;
 }
@@ -281,7 +269,7 @@ input:checked + .slider:before {
   background: #FFFFFF;
   left: 8px;
   top: 271px;
-  margin-left: 10px;
+  margin-left: 45px;
   /* Background */
   box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.16);
   border-radius: 4px;
@@ -320,9 +308,7 @@ input:checked + .slider:before {
 .chat-message-username {
   font-weight: bold;
   margin-bottom: 2px;
-  margin-top: 2px;
-
-  
+  margin-top: 2px;  
 }
 
 .chat-message-text {
@@ -364,7 +350,7 @@ input:checked + .slider:before {
 }
 
 .chat-container {
-  height: 300px;
+  height: 280px;
   overflow-y:auto;
 }
 
@@ -373,8 +359,8 @@ input:checked + .slider:before {
   position: relative;
   width: 291px;
   height: 0px;
-  left: calc(30% - 10px/2);
-  margin-left: 40px;
+  left: calc(30% - 50px/2);
+  margin-left: 100px;
   top: 4px;
   bottom: -8px;
   font-family: Helvetica;
@@ -415,8 +401,8 @@ input:checked + .slider:before {
 }
 
 .options-container{
-    position:relative;
-    display:inline-block;
+  position:relative;
+  display:inline-block;
 }
 
 .options {
