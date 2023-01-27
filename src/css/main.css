@@ -9,13 +9,17 @@ body {
   font-family: "Lato", sans-serif;
   width: 400px;
   height: 230px;
+  font-family: Helvetica;
+  width: 361px;
+  height: 291px;
 }
 
 
 #btn_user_profile{
   /* display: block; */
   position: relative;
-  margin-right: -30px;
+  /* margin-right: -30px; */
+  /* margin-right: -50px; */
   height: 20px;
   width: 20px;
   border-radius: 100%;
@@ -23,10 +27,8 @@ body {
   top: 2px;
   bottom: -8px;
   border: 1px transparent;
-  margin-left: 100px;
-  /* display: inline-flex;
-  flex-direction: column; */
-  /* display: inline-block; */
+
+  margin-left: 160px;
   background-color: white;
   /* padding: 20px; */
   color: #9971FF;
