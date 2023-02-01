@@ -60,6 +60,7 @@ module.exports = {
         { from: './src/background/background.js' },
         { from: './src/icons/*' },
         { from: './src/css/*' },
+        { from: './src/fonts/*' },
         { from: './src/popup_views/main/database.json' }
       ],
     }),

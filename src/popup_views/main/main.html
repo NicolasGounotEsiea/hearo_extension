@@ -6,62 +6,62 @@
   <title>Main</title>
   <link rel="stylesheet" href="./src/css/main.css">
 </head>
-<div class="container">
-  <div class="text-center">
-    HEARO
-    <button id="btn_user_profile">P</button>
-  </div>
-</div>
-
 
 <body>
-  <div class="chat-container" id="messages">
+  <div class="header">
+    <h1 class="title">HEARO</h1>
+    <button id="btn_user_profile"></button>
+  </div>
+
+  <div class="chat-container" id="messages"></div>
+
+  <div class="write-comment">
+    <input type="text" id="text_field" placeholder="J'écris mon commentaire ici...">
+    <button id="publish_btn">Publier</button>
 
 
   </div>
-  
-  <input type="text" id="text_field" placeholder="J'écris mon commentaire ici...">
-  <button id="publishBtn" style="font-family: Arial, sans-serif;">Publier</button>
 
+  <div class="public_private">
+    <p class="public_private_description">Publier vos réactions en privées</p>
 
-  
-  
-  <p style="margin-left: 10px;color: white;" >
-         Publier vos réactions en privée:
     <label class="switch">
-               <input type="checkbox" data-toggle="1" value="0" id="private">
+      <input type="checkbox">
       <span class="slider round"></span>
     </label>
-  </p>
+  </div>
+
+  <div class="line"></div>
 
   <div class="player">
 
     <div class="buttons">
-      <button class="minus_ten myButton" id="minus_ten"></button>
-      <button class="play_pause myButton" id="play_pause"></button>
-      <button class="plus_thirty myButton" id="plus_thirty"></button>
+      <button class="minus_ten btn" id="minus_ten"></button>
+      <button class="play_pause btn" id="play_pause"></button>
+      <button class="plus_thirty btn" id="plus_thirty"></button>
     </div>
 
     <div class="informations">
-      <marquee scrollamount="3" class="episodeTitle"><br>Vous devez lancer un épisode pour pouvoir utiliser l'extension</marquee>
+      <!-- <marquee scrollamount="5" class="episodeTitle">Vous devez lancer un épisode pour pouvoir utiliser l'extension</marquee> -->
+      <h1 class="episodeTitle">Vous devez lancer un épisode pour pouvoir utiliser l'extension</h1>
       <h1 class="current_timecode" id="current_timecode">xx:xx</h1>
     </div>
 
   </div>
-  
-<!-- <<<<<<< wrong_page -->
-  
 
-  
-
-<!--   <h1 class="current_timecode"></h1> -->
+  <!-- <<<<<<< wrong_page -->
 
 
 
-  
-<!--   <h1 class="episodeTitle">Vous devez lancer un épisode pour pouvoir utiliser l'extension</h1> -->
-<!-- ======= -->
-<!-- >>>>>>> development -->
+
+  <!--   <h1 class="current_timecode"></h1> -->
+
+
+
+
+  <!--   <h1 class="episodeTitle">Vous devez lancer un épisode pour pouvoir utiliser l'extension</h1> -->
+  <!-- ======= -->
+  <!-- >>>>>>> development -->
 </body>
 
 </html>
