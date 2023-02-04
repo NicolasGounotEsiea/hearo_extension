@@ -373,130 +373,42 @@ function update_PlayPause () {
 
 function updateLecture (playingState) {
   var button = document.getElementById('play_pause')
-  if (playingState) {
+  if (playingState === "Lecture") {
     button.setAttribute('class', 'play_pause myButton')
-  } else {
+  } else if (playingState === "Pause") {
     button.setAttribute('class', 'pause_play myButton')
   }
 }
 
-// chrome.runtime.connect({ name: 'main' })
 
 // update_PlayPause()
 
-// chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
-//   let url = tabs[0].url;
-//   console.log(url);
-//   console.log(url.search("podcasts.google"));
-//   if(url.search("podcasts.google") == -1)
-//   {
-//     console.log(url.search("podcasts.google"));
-//     window.location.replace('./wrong_tab.html');
-//   }
-//   // use `url` here inside the callback because it's asynchronous!
-// });
-
-// function slideTheEpisodeTitle() {
-//   console.log("GOOOOO")
-//   document.getElementsByClassName('epTitle')[0].style.animation = "myAnim 5s linear 1s 2 alternate none";
-//   document.getElementsByClassName('epTitle')[0].style.animation = "";
-// }
-
-// setInterval(slideTheEpisodeTitle, 20000);
-
-
-// Liste tous les onglets
-// var tabs = await chrome.tabs.query({});
-// tabs.forEach(function (tab) {
-//   console.log("tab : ", tab)
-// });
-
-// chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-//   var port = chrome.tabs.connect(tabs[0].id, { name: 'knockknock' })
-//   console.log("main-script.js - port created with a specific tabid : ", port.name, tabs[0]);
-  
-//   console.log("main-script.js - Wait 3scd before sending msg");
-//   setTimeout(() => {
-//     port.postMessage({ joke: 'Knock knock' })
-//     console.log("main-script.js - Message sent : {joke: 'Knock knock'}")
-//   }, 3000)
-
-//   console.log("main-script.js - creation of port.onMessage.addListener")
-//   port.onMessage.addListener(function (msg) {
-//     console.log("main-script.js - Message received : ", msg)
-
-//     // if (msg.question === "Who's there?") port.postMessage({ answer: 'Madame' })
-//     // else if (msg.question === 'Madame who?')
-//     //   port.postMessage({ answer: 'Madame... Bovary' })
-//   })
-// })
-
-
-
-// var mainConnectionPort = null;
-// var getTimeCodePort = null;
-
-// function connectMainConnectionPort() {
-//   mainConnectionPort = chrome.runtime.connect({ name: 'main_connection' });
-//   console.log("main.js - port " + mainConnectionPort.name + " has been created.");
-//   mainConnectionPort.onDisconnect.addListener(function() {
-//     mainConnectionPort = null;
-//     setTimeout(connectMainConnectionPort, 1000);
-//   });
-// }
-
-// function connectGetTimeCodePort() {
-//   getTimeCodePort = chrome.runtime.connect({ name: 'get_timecode' });
-//   console.log("main.js - port " + getTimeCodePort.name + " has been created.");
-//   getTimeCodePort.onDisconnect.addListener(function() {
-//     getTimeCodePort = null;
-//     setTimeout(connectGetTimeCodePort, 1000);
-//   });
-// }
-
-// connectMainConnectionPort();
-// connectGetTimeCodePort();
-
-// document.addEventListener('DOMContentLoaded', function () {
-//   mainConnectionPort.postMessage({ mainIsOpen: true })
-// })
-
-// console.log('main.js - onConnect addListener created');
-// chrome.runtime.onConnect.addListener(function (port) {
-//   console.log('main.js - Port detected : ', port);
-//   // if (port.name === 'timecode') {
-//   //   console.log("main.js - The port " + port.name + " is connected from this tab : " + port.sender.origin);
-//   //   port.onMessage.addListener(function (msg) {
-//   //     console.log('main.js - Message received : ', msg, " from this tab : ", port.sender.origin);
-//   //     updateTimeCode (msg.startingTime, msg.endingTime);
-//   //   })
-//   //   port.onDisconnect.addListener(function() {
-//   //     console.log("main.js - The port " + port.name + " has been disconnected from this tab : " + port.sender.origin);
-//   //   });
-//   // }
-// })
-
+var mainForBackgroundPort = chrome.runtime.connect({ name: 'main_connection_for_background' });
 
 chrome.tabs.query({}, function (tabs) {
   tabs.forEach(function (tab) {
     if (tab.url.includes('podcasts.google.com')) {
-      var timecodePort = chrome.tabs.connect(tab.id, { name: 'timecode_port' });
-      var playerButtonsPort = chrome.tabs.connect(tab.id, { name: 'player_buttons' });
+      var mainForForegroundPort = chrome.tabs.connect(tab.id, { name: 'main_connection_for_foreground' });
       var podcastInformationsPort = chrome.tabs.connect(tab.id, { name: 'podcast_informations' });
-      
-      timecodePort.onMessage.addListener(function(msg) {
+      var playerActionsPort = chrome.tabs.connect(tab.id, { name: 'player_actions' });
+
+      podcastInformationsPort.onMessage.addListener(function(msg) {
+        updtateEpisodeTitle(msg.episodeTitle);
+        updateLecture(msg.lecture);
         updateTimeCode(msg.startingTime, msg.endingTime);
       });
       
-      playerButtonsPort.onMessage.addListener(function(msg) {
-        console.log("main.js - msg received on player_buttons port : ", msg)
-        updateLecture(msg.lecture);
-      });
+      document.querySelector('#minus_ten').addEventListener('click', () => {
+        playerActionsPort.postMessage({ order: "click_minus_ten"})
+      })
 
-      podcastInformationsPort.onMessage.addListener(function(msg) {
-        console.log("main.js - msg received on podcast_informations port : ", msg)
-        updtateEpisodeTitle(msg.episodeTitle);
-      });
+      document.querySelector('#play_pause').addEventListener('click', () => {
+        playerActionsPort.postMessage({ order: "click_play_pause"})
+      })
+
+      document.querySelector('#plus_thirty').addEventListener('click', () => {
+        playerActionsPort.postMessage({ order: "click_plus_thirty"})
+      })
     }
   })
 })
