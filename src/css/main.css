@@ -106,27 +106,6 @@ body {
   font-size: smaller;
   margin-right: 4px;
 }
-h3 {
-  position: absolute;
-  width: 37px;
-  height: 12px;
-  left: calc(50% - 37px/2);
-  top: 5px;
-
-  font-family: Helvetica;
-  font-style: normal;
-  font-weight: 900;
-  font-size: 10px;
-  line-height: 12px;
-  /* identical to box height */
-
-  display: flex;
-  align-items: center;
-  text-align: center;
-  letter-spacing: 0.10em;
-
-  color: #FFFFFF;
-}
 
 /* WRITE COMMENT */
 /* WRITE COMMENT */
@@ -259,7 +238,9 @@ input:checked+.slider:before {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  /* overflow: hidden; */
   /* border: 2px solid blue */
 }
 .buttons {
@@ -322,13 +303,20 @@ input:checked+.slider:before {
 }
 .informations {
   display: flex;
-  float: left;
   flex-direction: column;
-  width: 60%;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: flex-start;
+  align-content: stretch;
+  gap: 7px;
+  /* float: left; */
+  width: 65%;
   margin-left: 10px;
   /* border: 2px solid red */
+  overflow: hidden;
 }
 .episodeTitle {
+  margin: 0;
   font-family: 'Rubik';
   font-style: normal;
   font-weight: 700;
@@ -336,17 +324,35 @@ input:checked+.slider:before {
   line-height: 12px;
   color: #FFFFFF;
   white-space: nowrap;
-  border: 2px solid black
+  animation: myAnim 10s linear 1s infinite alternate none;
+  /* border: 2px solid red; */
 }
 .current_timecode {
+  margin: 0;
   font-family: 'Rubik';
   font-style: normal;
   font-weight: 600;
   font-size: 10px;
   line-height: 9px;
   color: #FFFFFF;
-  border: 2px solid black
+  /* border: 2px solid black */
 }
+
+
+@keyframes myAnim {
+	0% {
+		transform: translateX(0);
+	}
+
+	100% {
+		transform: translateX(-100%);
+    /* -100% + la taille de la div */
+	}
+}
+
+
+
+
 
 
 
@@ -373,8 +379,6 @@ input:checked+.slider:before {
   font-weight: bold;
   margin-bottom: 2px;
   margin-top: 2px;
-
-
 }
 
 .chat-message-text {
@@ -384,7 +388,6 @@ input:checked+.slider:before {
   overflow-wrap: break-word;
   word-wrap: break-word;
 }
-
 
 .user-message {
   display: flex;
@@ -412,17 +415,12 @@ input:checked+.slider:before {
   font-weight: normal;
   font-size: smaller;
   margin-right: 4px;
-
 }
 
 .chat-container {
   height: 300px;
   overflow-y: auto;
 }
-
-
-
-
 
 .commentbox {
   position: relative;

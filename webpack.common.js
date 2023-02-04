@@ -4,9 +4,6 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
-
-
-  
   // Note: 
   // Chrome MV3 no longer allowed remote hosted code
   // Using module bundlers we can add the required code for your extension
@@ -14,7 +11,7 @@ module.exports = {
   entry: {
     firebase_config: './src/popup_views/firebase_config.js',
     login: './src/popup_views/login/login.js',
-    main_script: './src/popup_views/main/main-script.js',
+    main: './src/popup_views/main/main.js',
     content_script: './src/content/content-script.js',
     content: './src/content/content.js',
     foreground: './src/content/foreground.js',
@@ -41,7 +38,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "src", "popup_views", "main", "main.html"),
       filename: "main.html",
-      chunks: ["main_script"] // This is script from entry point
+      chunks: ["main"] // This is script from entry point
     }),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "src", "popup_views", "settings", "settings.html"),

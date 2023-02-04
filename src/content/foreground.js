@@ -5,75 +5,61 @@ console.log("------------ FOREGROUND.JS IS LOADED ------------");
 // *************************************************************
 
 var popupMainViewIsOpen = false;
-var startingTime = "xx:xx";
-var endingTime = "xx:xx";
-var loopIsActive = false;
-var podcastIsPlaying = true;
-var currentEpisode = {
-  episodeTitle: "",
-  podcastRssUrl: ""
-};
+var timecodePort = null;
+var podcastInformationsPort = null;
 
-function nonstopSendingTimecode() {
-  var loop = setInterval(() => {
-    if (loopIsActive) {
-      startingTime = document.getElementsByClassName("oG0wpe")[0].firstChild.textContent;
-      endingTime = document.getElementsByClassName("oG0wpe")[0].lastChild.textContent;
-      currentEpisode.episodeTitle = document.querySelector("div[jsname='jLuDgc']").textContent;
-      currentEpisode.podcastRssUrl = document.querySelector("div[jsname='NTHlvd']").textContent;
-      
-      if (document.querySelector("div[jsname='IGlMSc']").ariaLabel === "Lecture") {
-        podcastIsPlaying = false;
-      } else if (document.querySelector("div[jsname='IGlMSc']").ariaLabel === "Pause") {
-        podcastIsPlaying = true;
-      }
+chrome.runtime.onConnect.addListener(function (port) {
+  if (port.name === "main_connection_for_foreground") {
+    console.log("Main view est actif.");
+    
+    timecodePort = port;
+    popupMainViewIsOpen = true;
+    
+    port.onDisconnect.addListener(function() {
+      popupMainViewIsOpen = false;
+      console.log("Main view n'est plus actif.");
+    });
+  }
+})
 
-      if (popupMainViewIsOpen) {
-        console.log("Main open - podcast playing ("+podcastIsPlaying+") - Timecode (" + startingTime + " / " + endingTime + ")");
-        chrome.runtime.sendMessage({
-          podcastIsPlaying: podcastIsPlaying,
-          startingTime: startingTime,
-          endingTime: endingTime,
-          episodeTitle: currentEpisode.episodeTitle
-        });
-      } else {
-        clearInterval(loop);
-        console.log("Popup main view is not open");
+chrome.runtime.onConnect.addListener(function (port) {
+  if (port.name === "podcast_informations") {
+    podcastInformationsPort = port;
+  }
+})
+
+chrome.runtime.onConnect.addListener(function (port) {
+  if (port.name === "player_actions") {
+    port.onMessage.addListener(function (msg) {
+      switch (msg.order) {
+        case 'click_play_pause':
+          document.querySelector("div[jsname='IGlMSc']").click();
+          break;
+        case 'click_plus_thirty':
+          document.querySelector("div[jsname='xBcuNc']").click();
+          break;
+        case 'click_minus_ten':
+          document.querySelector("div[jsname='HQzqRc']").click();
+          break;
+        default:
+          console.log("no order from main view")
       }
+    })
+  }
+})
+
+setInterval(() => {
+  if (popupMainViewIsOpen) {
+    if (podcastInformationsPort !== null) {
+      podcastInformationsPort.postMessage({
+        startingTime: document.getElementsByClassName("oG0wpe")[0].firstChild.textContent,
+        endingTime: document.getElementsByClassName("oG0wpe")[0].lastChild.textContent,
+        lecture: document.querySelector("div[jsname='IGlMSc']").ariaLabel,
+        episodeTitle: document.querySelector("div[jsname='jLuDgc']").textContent,
+        podcastRssUrl: document.querySelector("div[jsname='NTHlvd']").textContent
+      })
     } else {
-      clearInterval(loop);
+      console.log("podcastInformationsPort is null so we can't send informations.");
     }
-  }, 1000);
-}
-
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
-  if (request.mainViewIsOpen) {
-    popupMainViewIsOpen = request.mainViewIsOpen;
-    if (!loopIsActive) {
-      nonstopSendingTimecode();
-      loopIsActive = true;
-    }
-  } else {
-    loopIsActive = false;
-    popupMainViewIsOpen = request.mainViewIsOpen;
   }
-  
-  switch (request.playerAction) {
-    case 'PLAY PAUSE':
-      console.log('PLAY PAUSE');
-      document.querySelector("div[jsname='IGlMSc']").click();
-      break;
-    case 'PLUS THIRTY':
-      console.log('PLUS THIRTY');
-      document.querySelector("div[jsname='xBcuNc']").click();
-      break;
-    case 'MINUS TEN':
-      console.log('MINUS TEN');
-      document.querySelector("div[jsname='HQzqRc']").click();
-      break;
-    case '':
-      console.log('RIEN');
-      break;
-    default:   
-  }
-});
+}, 100);
