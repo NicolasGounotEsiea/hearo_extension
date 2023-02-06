@@ -33,7 +33,7 @@ var commentToSend = {
   userName: '',
   userId: '',
   comment: '',
-  private: '0'
+  private: false
 }
 
 var currentEpisode = {
@@ -171,8 +171,8 @@ document.querySelector('#publish_btn').addEventListener('click', () => {
   commentToSend.userName = currentUser.displayName
   commentToSend.userId = currentUser.uid
   commentToSend.comment = document.getElementById('text_field').value
-  // commentToSend.private = document.getElementById('private').value
-  commentToSend.private = '0'
+  commentToSend.private = document.getElementById('togBtn').checked
+  // commentToSend.private = '0'
 
   if (commentToSend.comment.length === 0) {
     document.getElementById('text_field').placeholder = 'Entrez un commentaire valide'
@@ -353,30 +353,30 @@ function response () {
   }
 }
 
-document.querySelector('#test').addEventListener('click', async () => {
-  console.log('TEST')
-  console.log("document.getElementById('private').value : ", document.getElementById('slider round').value);
-  // testAff("bonjour");
-  // getAllComments();
+// document.querySelector('#test').addEventListener('click', async () => {
+//   console.log('TEST')
+//   console.log("document.getElementById('private').value : ", document.getElementById('slider round').value);
+//   // testAff("bonjour");
+//   // getAllComments();
 
-  // var currentCollection = "cities";
-  // Date.now()
+//   // var currentCollection = "cities";
+//   // Date.now()
 
-  // console.log('currentData.episode.title = ', currentData.episode.title)
-  // // Add a new document with a generated id.
-  // const docRef = await addDoc(collection(db, currentData.episode.title), {
-  //   name: 'Tokyo2',
-  //   country: 'Japan'
-  // })
-  // console.log('Document written with ID: ', docRef.id)
+//   // console.log('currentData.episode.title = ', currentData.episode.title)
+//   // // Add a new document with a generated id.
+//   // const docRef = await addDoc(collection(db, currentData.episode.title), {
+//   //   name: 'Tokyo2',
+//   //   country: 'Japan'
+//   // })
+//   // console.log('Document written with ID: ', docRef.id)
 
-  // // Get all documents in a collection
-  // const querySnapshot = await getDocs(collection(db, currentCollection));
-  // querySnapshot.forEach((doc) => {
-  //   // doc.data() is never undefined for query doc snapshots
-  //   console.log(doc.id, " => ", doc.data());
-  // });
-})
+//   // // Get all documents in a collection
+//   // const querySnapshot = await getDocs(collection(db, currentCollection));
+//   // querySnapshot.forEach((doc) => {
+//   //   // doc.data() is never undefined for query doc snapshots
+//   //   console.log(doc.id, " => ", doc.data());
+//   // });
+// })
 
 // const getAllComments = async () => {
 //   const querySnapshot = await getDocs(collection(db, "AH OUAIS ? - Pourquoi les poteaux de foot sont-ils ronds ?"));
