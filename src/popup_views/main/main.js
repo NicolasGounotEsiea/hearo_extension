@@ -26,6 +26,7 @@ var limite = 10 //limite de message du chat
 var numMess = 0 //nombre de messages affichés depuis le début
 var messageElement = '' //élément injecter pour afficher le commentaire
 var preced = '' //div du message precedent
+// var lauchGetAllComments = true;
 
 var commentToSend = {
   podcastEpisode: {},
@@ -36,10 +37,6 @@ var commentToSend = {
   private: false
 }
 
-var currentEpisode = {
-  title: '',
-  rssUrl: ''
-}
 
 var currentData = {
   userIsLoggedIn: false,
@@ -53,6 +50,16 @@ var currentData = {
     rssUrl: ''
   }
 }
+
+var episodeTempo = ''
+
+var getCurrentEpisodeTitle = setInterval(() => {
+  if (currentData.episode.title !== '') {
+    episodeTempo = currentData.episode.title;
+    console.log("Current episode tempo is : ", episodeTempo);
+    clearInterval(getCurrentEpisodeTitle);
+  }
+}, 1000);
 
 var currentUser = null
 
@@ -68,6 +75,41 @@ onAuthStateChanged(auth, user => {
     window.location.replace('./login.html')
   }
 })
+
+
+
+window.onload = function() {
+  console.log("Page loaded !!");
+  console.log("currentData.episode.title = ", currentData.episode.title);
+  if (currentData.episode.title !== '') {
+    getAllComments(currentData.episode.title);
+  }  
+}
+
+
+console.log("Launch launchGetAllCommentsOneTime setInterval")
+var launchGetAllCommentsOneTime = setInterval(() => {
+  if (currentData.episode.title != '') {
+    console.log("currentData.episode.title = ", currentData.episode.title)
+    console.log("launch getAllComments")
+    getAllComments(currentData.episode.title);
+    console.log("Stop launchGetAllCommentsOneTime setInterval")
+    clearInterval(launchGetAllCommentsOneTime);
+  }
+}, 1000);
+
+var detectNewEpisode = setInterval(() => {
+  
+  if (episodeTempo !== '') {
+    // console.log("episodeTempo = " + episodeTempo);
+    // console.log("currentData.episode.title = " + currentData.episode.title);
+    if (episodeTempo !== currentData.episode.title) {
+      console.log("episodeTempo and currentData.episode.title are different.");
+      getAllComments(currentData.episode.title);
+      episodeTempo = currentData.episode.title;
+    }
+  }
+}, 1000);
 
 // document.addEventListener('DOMContentLoaded', function () {
 //   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -353,38 +395,44 @@ function response () {
   }
 }
 
-// document.querySelector('#test').addEventListener('click', async () => {
-//   console.log('TEST')
-//   console.log("document.getElementById('private').value : ", document.getElementById('slider round').value);
-//   // testAff("bonjour");
-//   // getAllComments();
+document.querySelector('#test').addEventListener('click', async () => {
+  console.log('TEST')
+  // console.log("document.getElementById('private').value : ", document.getElementById('slider round').value);
+  // testAff("bonjour");
+  // getAllComments();
 
-//   // var currentCollection = "cities";
-//   // Date.now()
+  // var currentCollection = "cities";
+  // Date.now()
 
-//   // console.log('currentData.episode.title = ', currentData.episode.title)
-//   // // Add a new document with a generated id.
-//   // const docRef = await addDoc(collection(db, currentData.episode.title), {
-//   //   name: 'Tokyo2',
-//   //   country: 'Japan'
-//   // })
-//   // console.log('Document written with ID: ', docRef.id)
+  // console.log('currentData.episode.title = ', currentData.episode.title)
+  // // Add a new document with a generated id.
+  // const docRef = await addDoc(collection(db, currentData.episode.title), {
+  //   name: 'Tokyo2',
+  //   country: 'Japan'
+  // })
+  // console.log('Document written with ID: ', docRef.id)
 
-//   // // Get all documents in a collection
-//   // const querySnapshot = await getDocs(collection(db, currentCollection));
-//   // querySnapshot.forEach((doc) => {
-//   //   // doc.data() is never undefined for query doc snapshots
-//   //   console.log(doc.id, " => ", doc.data());
-//   // });
-// })
+  // // Get all documents in a collection
+  // const querySnapshot = await getDocs(collection(db, currentCollection));
+  // querySnapshot.forEach((doc) => {
+  //   // doc.data() is never undefined for query doc snapshots
+  //   console.log(doc.id, " => ", doc.data());
+  // });
+  // getAllComments();
+})
 
-// const getAllComments = async () => {
-//   const querySnapshot = await getDocs(collection(db, "AH OUAIS ? - Pourquoi les poteaux de foot sont-ils ronds ?"));
-//   querySnapshot.forEach((doc) => {
-//     // doc.data() is never undefined for query doc snapshots
-//     console.log(doc.id, " => ", doc.data());
-//   });
-// }
+const getAllComments = async (episodeTitle) => {
+  // comment faire si l'episode title n'exsite pas ? pour
+  // l'instant on va juste rien afficher et si tu reload l'extension 
+  // ça va re-récupérer les commentaires et si une personne 
+  // a êcrit un commentaire entre temps, il s'affichera
+  const querySnapshot = await getDocs(collection(db, episodeTitle));
+  console.log(querySnapshot.size + " COMMENTAIRES POUR L'EPISODE " + episodeTitle);
+  querySnapshot.forEach((doc) => {
+    // doc.data() is never undefined for query doc snapshots
+    console.log(doc.id, " => ", doc.data());
+  });
+}
 
 var mainForBackgroundPort = chrome.runtime.connect({
   name: 'main_connection_for_background'
@@ -404,9 +452,9 @@ chrome.tabs.query({}, function (tabs) {
       })
 
       podcastInformationsPort.onMessage.addListener(function (msg) {
-        currentEpisode.title = msg.episodeTitle
-        currentEpisode.rssUrl = msg.podcastRssUrl
-        updtateEpisodeTitle(currentEpisode.title)
+        currentData.episode.title = msg.episodeTitle
+        currentData.episode.rssUrl = msg.podcastRssUrl
+        updtateEpisodeTitle(currentData.episode.title)
 
         updateLecture(msg.lecture)
 
