@@ -411,10 +411,10 @@ chrome.tabs.query({}, function (tabs) {
         updateLecture(msg.lecture)
 
         currentData.timecode.startingTime = msg.startingTime
-        currentData.timecode.startingTime = msg.endingTime
+        currentData.timecode.endingTime = msg.endingTime
         updateTimeCode(
           currentData.timecode.startingTime,
-          currentData.timecode.startingTime
+          currentData.timecode.endingTime
         )
       })
 
