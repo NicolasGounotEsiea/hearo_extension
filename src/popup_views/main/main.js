@@ -20,15 +20,15 @@ const { getFirestore, Timestamp, FieldValue } = require('../firebase_config')
 import 'firebase/database'
 
 //VARIABLES GLOBALES
-var comment = ''
-var mess = ''
-var limite = 10 //limite de message du chat
-var numMess = 0 //nombre de messages affichés depuis le début
-var messageElement = '' //élément injecter pour afficher le commentaire
-var preced = '' //div du message precedent
+let comment = ''
+let mess = ''
+let limite = 10 //limite de message du chat
+let numMess = 0 //nombre de messages affichés depuis le début
+let messageElement = '' //élément injecter pour afficher le commentaire
+let preced = '' //div du message precedent
 // var lauchGetAllComments = true;
 
-var commentToSend = {
+let commentToSend = {
   podcastEpisode: {},
   timecode: '',
   userName: '',
@@ -38,7 +38,8 @@ var commentToSend = {
 }
 
 
-var currentData = {
+
+let currentData = {
   userIsLoggedIn: false,
   podcastIsPlaying: false,
   timecode: {
@@ -51,9 +52,9 @@ var currentData = {
   }
 }
 
-var episodeTempo = ''
+let episodeTempo = ''
 
-var getCurrentEpisodeTitle = setInterval(() => {
+let getCurrentEpisodeTitle = setInterval(() => {
   if (currentData.episode.title !== '') {
     episodeTempo = currentData.episode.title;
     console.log("Current episode tempo is : ", episodeTempo);
@@ -510,3 +511,8 @@ function updateTimeCode (startingTime, endingTime) {
   var myElement = document.getElementsByClassName('current_timecode')[0]
   myElement.innerHTML = startingTime + ' / ' + endingTime
 }
+
+
+chrome.storage.local.get(["key2"]).then((result) => {
+  console.log("Value currently from the MAIN is ", result.key2);
+});

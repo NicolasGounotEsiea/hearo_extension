@@ -73,3 +73,39 @@ chrome.runtime.onConnect.addListener(function (port) {
     });
   }
 })
+
+// var value = {
+//   ep: 'episode de mon podcast',
+//   comments: [
+//     {
+//       comment: 'un commentaire 1'
+//     },
+//     {
+//       comment: 'un commentaire 2'
+//     },
+//     {
+//       comment: 'un commentaire 3'
+//     }
+//   ]
+// }
+
+var value = "1"
+var value2 = "2"
+
+chrome.storage.local.set({ key: value }).then(() => {
+  console.log("Value is set to ", value);
+});
+
+chrome.storage.local.set({ key2: value2 }).then(() => {
+  console.log("Value is set to ", value2);
+});
+
+chrome.storage.local.get(["key"]).then((result) => {
+  console.log("Value currently is ", result.key);
+});
+
+chrome.storage.local.get(["key2"]).then((result) => {
+  console.log("Value currently is ", result.key2);
+});
+
+chrome.storage.local.
