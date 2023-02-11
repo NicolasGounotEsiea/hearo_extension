@@ -14,6 +14,7 @@ chrome.tabs.query({}, function (tabs) {
     if (tab.url.includes('podcasts.google.com')) {
       rightTab = tab
 
+      console.log("scriptIsInjected : ", scriptIsInjected);
       if (!scriptIsInjected) {
         chrome.scripting
           .executeScript({
@@ -23,7 +24,7 @@ chrome.tabs.query({}, function (tabs) {
           .then(() => {
             scriptIsInjected = true
             console.log(
-              'Foreground script injected in this tab : ',
+              'background.js - Foreground script injected in this tab : ',
               rightTab.url
             )
           })
@@ -35,8 +36,9 @@ chrome.tabs.query({}, function (tabs) {
 
 // Ré-injecter le script quand la page est actualisé
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  scriptIsInjected = false
-  if ( changeInfo.status === 'complete' && tab.url.includes('podcasts.google.com') ) {
+  scriptIsInjected = false;
+  console.log("onUpdated scriptIsInjected : ", scriptIsInjected);
+  if ( changeInfo.status === 'complete' && tab.url.includes('podcasts.google.com') && !scriptIsInjected) {
     chrome.scripting
       .executeScript({
         target: { tabId: tab.id },
@@ -45,7 +47,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       .then(() => {
         scriptIsInjected = true
         rightTab = tab
-        console.log('Foreground script injected in this tab : ', rightTab.url)
+        console.log('background.js - Foreground script injected in this tab : ', rightTab.url)
       })
       .catch(err => console.log(err))
   }
@@ -64,48 +66,12 @@ chrome.runtime.onConnect.addListener(function (port) {
 // DÉTECTER QUAND LE MAIN EST DÉCONNECTÉ
 chrome.runtime.onConnect.addListener(function (port) {
   if (port.name === "main_connection_for_background") {
-    console.log("Main view est actif.");
+    console.log("background.js - Main view est actif.");
     mainViewIsOpen = true;
     
     port.onDisconnect.addListener(function() {
       mainViewIsOpen = false;
-      console.log("Main view n'est plus actif.");
+      console.log("background.js - Main view n'est plus actif.");
     });
   }
 })
-
-// var value = {
-//   ep: 'episode de mon podcast',
-//   comments: [
-//     {
-//       comment: 'un commentaire 1'
-//     },
-//     {
-//       comment: 'un commentaire 2'
-//     },
-//     {
-//       comment: 'un commentaire 3'
-//     }
-//   ]
-// }
-
-var value = "1"
-var value2 = "2"
-
-chrome.storage.local.set({ key: value }).then(() => {
-  console.log("Value is set to ", value);
-});
-
-chrome.storage.local.set({ key2: value2 }).then(() => {
-  console.log("Value is set to ", value2);
-});
-
-chrome.storage.local.get(["key"]).then((result) => {
-  console.log("Value currently is ", result.key);
-});
-
-chrome.storage.local.get(["key2"]).then((result) => {
-  console.log("Value currently is ", result.key2);
-});
-
-chrome.storage.local.

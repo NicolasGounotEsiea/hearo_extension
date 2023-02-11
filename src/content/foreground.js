@@ -8,16 +8,19 @@ var popupMainViewIsOpen = false;
 var timecodePort = null;
 var podcastInformationsPort = null;
 
+// Lancer une fois le script pour récupérer les commentaires de firestore
+// On récupére les commentaires des episodes stocké dans le storage de l'extension
+
 chrome.runtime.onConnect.addListener(function (port) {
   if (port.name === "main_connection_for_foreground") {
-    console.log("Main view est actif.");
+    console.log("foreground.js - Main view est actif.");
     
     timecodePort = port;
     popupMainViewIsOpen = true;
     
     port.onDisconnect.addListener(function() {
       popupMainViewIsOpen = false;
-      console.log("Main view n'est plus actif.");
+      console.log("foreground.js - Main view n'est plus actif.");
     });
   }
 })
@@ -62,4 +65,4 @@ setInterval(() => {
       console.log("podcastInformationsPort is null so we can't send informations.");
     }
   }
-}, 100);
+}, 3000);
