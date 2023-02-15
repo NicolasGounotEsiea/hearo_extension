@@ -6,10 +6,10 @@ console.log('------------ MAINS-CRIPT.JS IS LOADED ------------')
 
 var timecode = 0
 var userid
+import * as firebase from 'firebase/app'
 import { firebaseApp, db } from '../firebase_config'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { collection, addDoc, getDocs } from 'firebase/firestore'
-import * as firebase from 'firebase/app'
 
 const {
   initializeApp,
@@ -349,7 +349,7 @@ const fetchComments = async (episodeTitle) => {
   let comments = [];
   const querySnapshot = await getDocs(collection(db, episodeTitle));
   querySnapshot.forEach((doc) => {
-    console.log(doc.id, ' => ', doc.data());
+    // console.log(doc.id, ' => ', doc.data());
     comments.push(doc.data());
   });
   return comments;
@@ -463,10 +463,17 @@ function updateBuffer(episodeTitle) {
 document.querySelector('#test').addEventListener('click', async () => {
   // console.log('TEST')
   
-  
-  chrome.storage.sync.get(null, function(items) {
-    console.log(items)
+  // Add a new document.
+  const docRef = addDoc(collection(db, "test"), {"test": "test"})
+  .then((result) => {
+    console.log('Document written with ID: ', result.id)
+  }).catch((err) => {
+    console.error('Error adding document: ', e)  
   });
+  
+  // chrome.storage.sync.get(null, function(items) {
+  //   console.log(items)
+  // });
 
 })
 

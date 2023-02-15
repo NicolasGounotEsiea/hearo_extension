@@ -17,7 +17,8 @@ module.exports = {
     foreground: './src/content/foreground.js',
     settings_script: './src/popup_views/settings/settings-script.js',
     options: './src/options/options.js',
-    wrong_tab: './src/popup_views/wrong_tab/wrong_tab.js'
+    wrong_tab: './src/popup_views/wrong_tab/wrong_tab.js',
+    background: './src/background/background.js',
   },
   plugins: [
     new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
@@ -54,8 +55,8 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         { from: './src/manifest.json' },
-        { from: './src/background/background.js' },
         { from: './src/icons/*' },
+        { from: './src/background/background.js' },
         { from: './src/css/*' },
         { from: './src/fonts/*' },
         { from: './src/popup_views/main/database.json' }
