@@ -374,7 +374,7 @@ chrome.tabs.query({}, function (tabs) {
       let previousEpisode = ''
       var mainForForegroundPort = chrome.tabs.connect(tab.id, { name: 'main_connection_for_foreground' })
       var podcastInformationsPort = chrome.tabs.connect(tab.id, { name: 'podcast_informations' })
-      var playerActionsPort = chrome.tabs.connect(tab.id, { name: 'player_actions' })
+      var playerActionsPort = chrome.tabs.connect(tab.id, { name: 'main_orders_for_foreground' })
 
       podcastInformationsPort.onMessage.addListener(function (msg) {
         currentData.episode.title = msg.episodeTitle
@@ -541,3 +541,21 @@ function updateTimeCode (startingTime, endingTime) {
   var myElement = document.getElementsByClassName('current_timecode')[0]
   myElement.innerHTML = startingTime + ' / ' + endingTime
 }
+
+
+
+
+
+chrome.runtime.onConnect.addListener(function (port) {
+  if (port.name === "comments_from_background") {
+    console.log("main.js - port received : ", port);
+    
+    port.onMessage.addListener(function (msg) {
+      console.log("main.js - message received : ", msg);
+    });
+
+    port.onDisconnect.addListener(function() {
+      console.log("main.js - background.js n'est plus actif.");
+    });
+  }
+})
