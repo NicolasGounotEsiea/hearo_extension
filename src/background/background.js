@@ -10,6 +10,8 @@ import { doc, onSnapshot, collection, getDocs } from 'firebase/firestore'
 let podcastInfos = {}
 let foregfroundIsInjected = false;
 let episodeTitleHistory = [''];
+let commentsPort = null;
+let mainPopupIsOpen = false;
 
 
 // injecté le script foreground.js dans la page web quand l'extension est installé
@@ -57,11 +59,10 @@ une meilleure expérience utilisateur (éviter les conflits de données).
 
 chrome.runtime.onConnect.addListener(function (port) {
   if (port.name === 'is_foreground_active') {
-    console.log("background.js - Le port " + port.name + " a été détecté donc le foreground.js est actif.");
+    // console.log("background.js - Le port " + port.name + " a été détecté donc le foreground.js est actif.");
 
-    // Création d'un port pour recevoir les informations du player depuis foreground
     let podcastInfosPort = chrome.tabs.connect(port.sender.tab.id, {name: "podcast_infos_channel"});
-    console.log("background.js - Le port " + podcastInfosPort.name + " a été créé pour recevoir les informations du player envoyées par foreground.js.");
+    // console.log("background.js - Le port " + podcastInfosPort.name + " a été créé pour recevoir les informations du player envoyées par foreground.js.");
 
     // On reçoit les informations du player ici et on les stocke dans la variable podcastInfos
     podcastInfosPort.onMessage.addListener(function(msg) {
@@ -75,77 +76,76 @@ chrome.runtime.onConnect.addListener(function (port) {
       }
     });
 
-    // Loop qui va remplir la variable historyEpisodeTitle avec les titres des épisodes
+    // Loop qui va remplir la variable historyEpisodeTitle avec les titres des épisodes et qui va permettre de détecter les changements d'épisodes pour agir en conséquence
     let firstOnSnapshotLauched = false;
     let currentComments = [];
 
-    var fillEpisodeTitleHistory = setInterval(() => {
+    let currentOnSnapshot = null;
+    let nextOnSnapshot = null;
+
+    let firstOnSnapshotId = setInterval(() => {
+      if (podcastInfos.episodeTitle !== '') {
+        if (commentsPort !== null && mainPopupIsOpen === true) {
+          // lancer le 1r onSnapshot pour l'épisode actuel ici
+
+          currentOnSnapshot = onSnapshot(collection(db, podcastInfos.episodeTitle), (snapshot) => {
+            currentComments = [];
+            snapshot.forEach((doc) => {
+              currentComments.push(doc.data());
+            });
+            console.log("Fetched comments of " + podcastInfos.episodeTitle + " : ", currentComments);
+            // TODOD : envoyer une fois les commentaires récupérés à la popup
+            console.log("background.js - A - On envoie les commentaires à la popup");
+            commentsPort.postMessage({comments: currentComments, episodeTitle: podcastInfos.episodeTitle});
+          });
+          firstOnSnapshotLauched = true;
+        }
+      }
+      
+      if (firstOnSnapshotLauched) {
+        clearInterval(firstOnSnapshotId);
+      }
+    }, 1000);
+
+    let keepEpisodeTitleHistoryUpToDate = setInterval(() => {
       // keeping the last 10 episode titles
       if (episodeTitleHistory.length > 10) {
         episodeTitleHistory.pop();
       }
 
-      // Lauch the first onSnapshot once
-      if (episodeTitleHistory[0] !== '') {
-        
-        if ( firstOnSnapshotLauched === false ) {
-          console.log("background.js - Lancement du premier onSnapshot pour l'épisode : ", episodeTitleHistory[0])
-          const firstUnsubscribe = onSnapshot(collection(db, episodeTitleHistory[0]), (snapshot) => {
+      if (podcastInfos.episodeTitle !== "" && episodeTitleHistory[0] !== '') {
+        if (episodeTitleHistory[0] !== podcastInfos.episodeTitle) {
+          // console.log("Un changement d'épisode a été détecté !");
+          
+          episodeTitleHistory.unshift(podcastInfos.episodeTitle);
+          console.log("L'épisode précédent était : ", episodeTitleHistory[1], " et l'épisode qui l'a remplacé est : ", episodeTitleHistory[0]);
+          
+          // console.log("background.js - On stop le premier onSnapshot pour l'épisode précédent : ", episodeTitleHistory[1])
+          if (currentOnSnapshot !== null) {
+            currentOnSnapshot();
+            currentOnSnapshot = null;
+          }
+          
+          // console.log("background.js - On en lance un nouveau pour l'épisode actuelle : ", episodeTitleHistory[0])
+          currentOnSnapshot = onSnapshot(collection(db, episodeTitleHistory[0]), (snapshot) => {
             currentComments = [];
             snapshot.forEach((doc) => {
               currentComments.push(doc.data());
             });
             console.log("Fetched comments of " + episodeTitleHistory[0] + " : ", currentComments);
+            // TODO : On envoie les commentaires mis à jour à la popup
+            if (commentsPort !== null && mainPopupIsOpen === true) {
+              console.log("background.js - B - On envoie les commentaires à la popup");
+              commentsPort.postMessage({comments: currentComments, episodeTitle: episodeTitleHistory[0]});
+            }
           });
-          firstOnSnapshotLauched = true;
+          
+          podcastInfos.episodeTitle = episodeTitleHistory[0];
         }
-        
-        if (episodeTitleHistory[0] !== podcastInfos.episodeTitle && podcastInfos.episodeTitle !== '') {
-          console.log("Un changement d'épisode a été détecté !");
-          
-          episodeTitleHistory.unshift(podcastInfos.episodeTitle);
-          console.log("L'épisode précédent était : ", episodeTitleHistory[1], " et l'épisode qui l'a remplacé est : ", episodeTitleHistory[0]);
-          
-          console.log("background.js - On stop le premier onSnapshot pour l'épisode précédent : ", episodeTitleHistory[1])
-          // TODO : trouver comment stopper un onSnapshot
-          
-          // Et on en lance un nouveau :
-          console.log("background.js - On en lance un nouveau pour l'épisode actuelle : ", episodeTitleHistory[0])
-
-          // const unsubscribe = onSnapshot(collection(db, episodeTitleHistory[0]), (snapshot) => {
-          //   snapshot.forEach((doc) => {
-          //     currentComments.push(doc.data());
-          //   });
-          //   console.log("Fetched comments of " + episodeTitleHistory[0] + " : ", currentComments);
-          // });
-
-          // TODO : Actions dès qu'un changement d'épisode est détecté
-          // relancer un onSnapshot avec le nouvel épisode (episodeTitleHistory[0])
-          
-        }
-      } else {
-        episodeTitleHistory[0] = podcastInfos.episodeTitle;
+      } else if (episodeTitleHistory[0] !== undefined) {
+        podcastInfos.episodeTitle = episodeTitleHistory[0];
       }
     }, 1000);
-
-
-    // setTimeout(() => {
-    //   console.log("podcastInfos: ", podcastInfos);
-    //   const collRef = collection(db, podcastInfos.episodeTitle);
-    //   console.log("collRef: ", collRef);
-    //   onSnapshot(collRef,(snapshot) => {
-    //     let comments = [];
-    //     snapshot.forEach((doc) => {
-    //       comments.push(doc.data());
-    //     });
-    //     console.log("Fetched comments: ", comments);
-  
-    //     // chrome.storage.sync.set({ [firstEpisodeTitle]: commentsList }).then(() => {
-    //     //   console.log("Commentaires de l'épisode [ ", firstEpisodeTitle, " ] récupérés et stockés dans le storage de l'extension : ", commentsList);
-    //     // });
-    //   });
-      
-    // }, 3000);
 
 
     port.onDisconnect.addListener(function () {
@@ -158,15 +158,17 @@ chrome.runtime.onConnect.addListener(function (port) {
 chrome.runtime.onConnect.addListener(function (port) {
   if (port.name === "main_connection_for_background") {
     console.log("background.js - Le port " + port.name + " a été détecté donc le main.js est actif.");
+    mainPopupIsOpen = true;
 
     console.log("background.js - Le port comments_from_background a été créé.")
-    let commentsPort = chrome.runtime.connect({ name: 'comments_from_background' });
+    commentsPort = chrome.runtime.connect({ name: 'comments_from_background' });
     
     // Envoie des commentaires à la popup
     // commentsPort.postMessage({ comments: 'des commentaires' });
     
     port.onDisconnect.addListener(function() {
       console.log("background.js - Le port " + port.name + " a été déconnecté donc le main.js n'est plus actif.");
+      mainPopupIsOpen = false;
     });
   }
 })

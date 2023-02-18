@@ -9,7 +9,7 @@ var userid
 import * as firebase from 'firebase/app'
 import { firebaseApp, db } from '../firebase_config'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { collection, addDoc, getDocs } from 'firebase/firestore'
+import { doc, onSnapshot, addDoc, collection, getDocs } from 'firebase/firestore'
 
 const {
   initializeApp,
@@ -459,10 +459,11 @@ function updateBuffer(episodeTitle) {
 
 
 
+document.querySelector('#test1').addEventListener('click', async () => {
+  console.log('TEST1')
+})
 
-document.querySelector('#test').addEventListener('click', async () => {
-  // console.log('TEST')
-  
+function addDocFirestore() {
   // Add a new document.
   const docRef = addDoc(collection(db, "test"), {"test": "test"})
   .then((result) => {
@@ -470,47 +471,35 @@ document.querySelector('#test').addEventListener('click', async () => {
   }).catch((err) => {
     console.error('Error adding document: ', e)  
   });
-  
-  // chrome.storage.sync.get(null, function(items) {
-  //   console.log(items)
-  // });
+}
 
-})
+function getAllLocalStorage() {
+  // Récupérer les données du storage
+  return chrome.storage.sync.get(null, function(items) {
+    console.log(items)
+  });
+}
 
 document.querySelector('#test2').addEventListener('click', async () => {
-  chrome.storage.sync.clear(function() {
-    var error = chrome.runtime.lastError;
+  console.log('TEST2')
+})
+
+document.querySelector('#test3').addEventListener('click', async () => {
+  console.log('TEST3')
+})
+
+document.querySelector('#test4').addEventListener('click', async () => {
+  
+})
+
+function clearLocalStorage() {
+  return chrome.storage.sync.clear(function() {
+    let error = chrome.runtime.lastError;
     if (error) {
       console.error(error);
     }
   })
-  
-  
-  // chrome.storage.sync.get(null, function(items) {
-  //   commentsBuffer = Object.keys(items);
-
-  //   let episodeTitle = "Une longue inspiration";
-  //   chrome.storage.sync.get(episodeTitle, function(item) {
-  //     let comments = item[episodeTitle];
-  //     comments.forEach((comment) => {
-  //       let messageToShow = {
-  //         podcastEpisode: {
-  //           title: episodeTitle,
-  //           url: ""
-  //         },
-  //         timecode: comment.data.timecode,
-  //         userName: comment.data.userName,
-  //         userId: comment.data.userId,
-  //         comment: comment.data.comment,
-  //         private: comment.data.private
-  //       }
-
-  //       // TODO : Afficher chaque commentaires dans la popup
-  //     })
-  //   });
-  // });
-
-})
+}
 
 document.querySelector('#btn_user_profile').addEventListener('click', () => {
   window.location.replace('./settings.html')
@@ -544,14 +533,18 @@ function updateTimeCode (startingTime, endingTime) {
 
 
 
-
+let previousCommentsList = [];
+let currentCommentsList = [];
 
 chrome.runtime.onConnect.addListener(function (port) {
   if (port.name === "comments_from_background") {
     console.log("main.js - port received : ", port);
     
     port.onMessage.addListener(function (msg) {
-      console.log("main.js - message received : ", msg);
+      console.log("main.js - Message received from " + port.name + " : ", msg);
+      
+      // TODO : Mettre à jour la popup avec une fonction qui va afficher les nouveaux commentaires
+      currentCommentsList = msg.comments;
     });
 
     port.onDisconnect.addListener(function() {
@@ -559,3 +552,26 @@ chrome.runtime.onConnect.addListener(function (port) {
     });
   }
 })
+
+
+
+// PROCHAINE SESSION DE CODE
+/*
+Il faut créer une fonction qui prends une liste de commentaire et qui met à jours l'affichage des commentaires
+dans la popup.
+Il faut réorganiser les commentaires par leur timestamp.
+Ajouter la notion de timestamp dans les data des commentaires.
+Ensuite on détecte les nouveaux commentaires à afficher et on les ajoutes à la suite de la liste des commentaires
+
+Et ensuite il faut faire fonctionner correctement le publish button pour envoyer les commentaires à la base de donnés
+
+Revoir la structure de la base de donnés pour qu'elle soit plus simple à utiliser avec une collections Podcasts, un collection Episodes
+dans laquelle on trouvera un objet : 
+{
+  "episodeId": "21873428174891248",
+  "podcastTitle": "Le podcast de la mort qui tue",
+  "comments": [],
+}
+
+surtout revoir la strucutre pour qu'on ait pas beaucoup de collections au lieu d'avoir une collection par épisode
+*/
