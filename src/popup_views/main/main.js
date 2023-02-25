@@ -9,7 +9,13 @@ var userid
 import * as firebase from 'firebase/app'
 import { firebaseApp, db } from '../firebase_config'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { doc, onSnapshot, addDoc, collection, getDocs } from 'firebase/firestore'
+import {
+  doc,
+  onSnapshot,
+  addDoc,
+  collection,
+  getDocs
+} from 'firebase/firestore'
 
 const {
   initializeApp,
@@ -26,9 +32,26 @@ let limite = 10 //limite de message du chat
 let numMess = 0 //nombre de messages affichés depuis le début
 let messageElement = '' //élément injecter pour afficher le commentaire
 let preced = '' //div du message precedent
-// var lauchGetAllComments = true;
 
-let mainForBackgroundPort = chrome.runtime.connect({ name: 'main_connection_for_background' })
+let mainPort = chrome.runtime.connect({ name: 'main_status' })
+
+let ordersForBg = chrome.runtime.connect({
+  name: 'orders_from_main'
+})
+
+let currentUser = null
+
+let previousCommentsList = []
+let currentCommentsList = []
+
+let commentObjectToSend = {
+  podcastEpisode: {},
+  timecode: '',
+  userName: '',
+  userId: '',
+  comment: '',
+  private: false
+}
 
 let commentToSend = {
   podcastEpisode: {},
@@ -52,154 +75,244 @@ let currentData = {
   }
 }
 
-let commentsBuffer;
-
-
-var currentUser = null
-
-let episodeTempo = ''
-
-// waiting for the current episode title to be loaded to get the episodeTempo
-let getCurrentEpisodeTitle = setInterval(() => {
-  if (currentData.episode.title !== '') {
-    episodeTempo = currentData.episode.title;
-    clearInterval(getCurrentEpisodeTitle);
-  }
-}, 1000);
-
-
-
-const auth = getAuth(firebaseApp) // Auth instance for the current firebaseApp
-
-onAuthStateChanged(auth, user => {
-  if (user != null) {
-    currentUser = user
-    currentData.userIsLoggedIn = true
-    // console.log('Below User is logged in : ', user)
-  } else {
-    currentData.userIsLoggedIn = false
-    window.location.replace('./login.html')
-  }
-})
-
-// Waiting for the current episode title to be loaded to launch getAllComments one time
-var launchGetAllCommentsOneTime = setInterval(() => {
-  if (currentData.episode.title != '') {
-    // console.log("currentData.episode.title = ", currentData.episode.title)
-    // console.log("launch getAllComments one time")
-    // getAllComments(currentData.episode.title);
-    // console.log("update buffer of currentData.episode.title = ", currentData.episode.title)
-
-    chrome.storage.sync.get(null, function(items) {
-      commentsBuffer = Object.keys(items);
-      updateBuffer(currentData.episode.title)
-    });
-    
-    // console.log("Stop launchGetAllCommentsOneTime setInterval")
-    clearInterval(launchGetAllCommentsOneTime);
-  }
-}, 1000);
-
-// Dectect when the episode title change to update the comments buffer
-// var detectNewEpisode = setInterval(() => {
-//   if (episodeTempo !== '') {
-//     if (episodeTempo !== currentData.episode.title && currentData.episode.title !== '') {
-//       console.log("Un changement d'épisode a été détecté !");
-//       console.log("L'épisode précédent était : ", episodeTempo, " et l'épisode qui l'a remplacé est : ", );
-//       updateBuffer(currentData.episode.title) // quand on detecte un changement d'épisode, on met à jour le buffer
-//       episodeTempo = currentData.episode.title;
-//     }
-//   }
-// }, 1000);
 
 // detect when main.html is completely load
 document.addEventListener('DOMContentLoaded', function () {
+  console.log('main.js - DOMContentLoaded')
+
+  chrome.storage.sync.get(['isUserLogIn'], function (data) {
+    if (data.isUserLogIn === 'No') {
+      window.location.replace('./login.html')
+    }
+  });
+
   document.querySelector('#btn_user_profile').addEventListener('click', () => {
     window.location.replace('./settings.html')
   })
 
-})
+  document.querySelector('#publish_btn').addEventListener('click', () => {
+    let textArea = document.getElementById('text_field')
+    let userComment = textArea.value
+    let toggleStatus = document.getElementById('togBtn').checked
 
-// chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-//   if (request.podcastIsPlaying) {
-//     podcastIsPlaying = true
-//     update_PlayPause()
-//   } else {
-//     podcastIsPlaying = false
-//     update_PlayPause()
-//   }
-
-//   const mySwitch = document.getElementById('private')
-//   mySwitch.addEventListener('switch', function () {
-//     if (mySwitch.value == 0) {
-//       document.getElementById('private').value = '1'
-//     } else {
-//       document.getElementById('private').value = '0'
-//     }
-//     console.log(mySwitch.value)
-//   })
-
-//   startingTime = request.startingTime
-//   endingTime = request.endingTime
-//   episodeTitle = request.episodeTitle
-//   updateTimeCode(startingTime, endingTime)
-//   updtateEpisodeTitle(episodeTitle)
-
-//   if (numMess > limite) {
-//     //limiter le nombre de messages dans le chat
-//     const messagesToDelete = numMess - limite - 1
-
-//     let myDiv = document.getElementById(messagesToDelete)
-//     console.log(myDiv)
-//     myDiv.parentNode.removeChild(myDiv)
-//   }
-// })
-
-document.querySelector('#publish_btn').addEventListener('click', () => {
-  commentToSend = {
-    podcastEpisode: currentData.episode,
-    timecode: currentData.timecode.startingTime,
-    userName: currentUser.displayName,
-    userId: currentUser.uid,
-    comment: document.getElementById('text_field').value,
-    private: document.getElementById('togBtn').checked
-  }
-
-  if (commentToSend.comment.length === 0) {
-    document.getElementById('text_field').placeholder = 'Entrez un commentaire valide'
-    document.getElementById('text_field').style.setProperty('color', 'white', 'important')
-    document.getElementById('text_field').style.setProperty('background-color', 'pink', 'important')
-  } else {
-    document.getElementById('text_field').placeholder = ' votre commentaire'
-    document.getElementById('text_field').style.setProperty('color', 'black')
-    document.getElementById('text_field').style.setProperty('background-color', 'white')
-    
-    var badWords = ['badword']
-    var sentence = commentToSend.comment
-    for (let i = 0; i < badWords.length; i++) {
-      var regex = new RegExp(badWords[i], 'gi')
-      sentence = sentence.replace(regex, '***')
+    if (userComment.length !== 0) {
+      textArea.placeholder = ' votre commentaire'
+      textArea.style.setProperty('color', 'black')
+      textArea.style.setProperty('background-color', 'white')
+      
+      commentObjectToSend = {
+        podcastEpisode: currentData.episode,
+        timecode: currentData.timecode.startingTime,
+        userName: currentUser.displayName,
+        userId: currentUser.uid,
+        comment: userComment,
+        private: toggleStatus
+      }
+      commentObjectToSend.comment = cleanBadWords(commentObjectToSend.comment)
+      
+      addDocFirestore(currentData.episode.title, commentObjectToSend)
+      
+      textArea.value = ''
+    } else {
+      updateStyleForEmptyComment(textArea)
     }
-    // console.log('Phrase modifiée : ' + sentence)
-    commentToSend.comment = sentence
-    document.getElementById('text_field').value = ''
-    // console.log('SUBMIT : ', commentToSend)
+  })
 
-    document.getElementById('text_field').value = ''
-    // console.log('SUBMIT : ', commentToSend)
-    
-    // Add a new document.
-    const docRef = addDoc(collection(db, currentData.episode.title), commentToSend)
-    .then((result) => {
-      console.log('Document written with ID: ', result.id)  
-    }).catch((err) => {
-      console.error('Error adding document: ', e)  
-    });
+  document.querySelector('#minus_ten').addEventListener('click', () => {
+    ordersForBg.postMessage({ order: 'click_minus_ten' })
+  })
 
-    // testAff(commentToSend)
-    // document.getElementById('private').value = '0'
+  document.querySelector('#play_pause').addEventListener('click', () => {
+    ordersForBg.postMessage({ order: getPlayPauseOrder() })
+    switchPlayPauseButton()
+  })
+
+  document.querySelector('#plus_thirty').addEventListener('click', () => {
+    ordersForBg.postMessage({ order: 'click_plus_thirty' })
+  })
+})
+
+mainPort.onMessage.addListener(function (msg) {
+  updateTimeCode(msg.startingTime, msg.endingTime)
+  updtateEpisodeTitle(msg.title)
+  updateLecture(msg.isPlaying)
+})
+
+document.querySelector('#test1').addEventListener('click', async () => {
+  console.log('CLICK1')
+
+  let commentsReceived = {
+    episodeTitle: 'my episode title',
+    rssUrl: 'my url',
+    comments: [
+      {
+        comment: 'my comment',
+        timecode: '00:14'
+      },
+      {
+        comment: 'my comment2',
+        timecode: '00:24'
+      },
+      {
+        comment: 'my comment3',
+        timecode: '01:34'
+      }
+    ]
+  }
+
+  // chrome.tabs.sendMessage(tab.id, {greeting: "hello"});
+})
+
+document.querySelector('#test2').addEventListener('click', async () => {
+  console.log('CLICK2')
+})
+
+document.querySelector('#test3').addEventListener('click', async () => {
+  console.log('CLICK3')
+})
+
+document.querySelector('#test4').addEventListener('click', async () => {
+  console.log('CLICK4')
+})
+
+chrome.runtime.onConnect.addListener(function (port) {
+  if (port.name === 'comments_from_bg') {
+    port.onMessage.addListener(function (msg) {
+      console.log('main.js - Message received from ' + port.name + ' : ', msg)
+      previousCommentsList = currentCommentsList
+      currentCommentsList = msg.comments
+      // TODO : Mettre à jour la popup avec une fonction qui va afficher les nouveaux commentaires
+    })
+
+    port.onDisconnect.addListener(function () {
+      console.log("main.js - background.js n'est plus actif.")
+    })
   }
 })
+
+function response () {
+  //surligne les réponses utilisateurs ("@...")
+  let elements = document.querySelectorAll('p, span')
+  for (let i = 0; i < elements.length; i++) {
+    elements[i].innerHTML = elements[i].innerHTML.replace(
+      /\S*@\S*/g,
+      '<mark>$&</mark>'
+    )
+  }
+}
+
+//fonction pour récupérer les commentaires du serveur firestore
+const fetchComments = async episodeTitle => {
+  let comments = []
+  const querySnapshot = await getDocs(collection(db, episodeTitle))
+  querySnapshot.forEach(doc => {
+    // console.log(doc.id, ' => ', doc.data());
+    comments.push(doc.data())
+  })
+  return comments
+}
+
+function clearLocalStorage () {
+  return chrome.storage.sync.clear(function () {
+    let error = chrome.runtime.lastError
+    if (error) {
+      console.error(error)
+    }
+  })
+}
+
+function getAllLocalStorage () {
+  // Récupérer les données du storage
+  return chrome.storage.sync.get(null, function (items) {
+    console.log(items)
+  })
+}
+
+//fonction pour récupérer les commentaires du serveur firestore
+const fetchBuffer = async () => {
+  let buffer = []
+  chrome.storage.sync.get(null, function (items) {
+    buffer = items
+  })
+  return buffer
+}
+
+function updateLecture (playingState) {
+  let button = document.getElementById('play_pause')
+  switch (playingState) {
+    case 'Lecture':
+      currentData.podcastIsPlaying = false
+      button.setAttribute('class', 'play_pause myButton')
+      break
+    case 'Pause':
+      currentData.podcastIsPlaying = true
+      button.setAttribute('class', 'pause_play myButton')
+      break
+    default:
+      break
+  }
+}
+
+function updtateEpisodeTitle (episodeTitle) {
+  let myElement = document.getElementsByClassName('episodeTitle')[0]
+  myElement.innerHTML = episodeTitle
+}
+
+function updateTimeCode (startingTime, endingTime) {
+  let myElement = document.getElementsByClassName('current_timecode')[0]
+  myElement.innerHTML = startingTime + ' / ' + endingTime
+}
+
+const updateStyleForEmptyComment = textArea => {
+  textArea.placeholder = 'Entrez un commentaire valide'
+  textArea.style.setProperty('color', 'white', 'important')
+  textArea.style.setProperty('background-color', 'pink', 'important')
+}
+
+const cleanBadWords = comment => {
+  var badWords = ['badword']
+  var sentence = comment
+  for (let i = 0; i < badWords.length; i++) {
+    var regex = new RegExp(badWords[i], 'gi')
+    sentence = sentence.replace(regex, '***')
+  }
+  return sentence
+}
+
+const addDocFirestore = async (collectionName, data) => {
+  if (collectionName !== "" && data !== "") {
+    const docRef = addDoc(collection(db, collectionName), data)
+    .then(result => {
+      console.log('Document written with ID: ', result.id)
+    })
+    .catch(err => {
+      console.error('Error adding document: ', e)
+    })
+    console.log('Document written with ID: ', docRef.id)
+  }
+}
+
+function getPlayPauseOrder () {
+  let button = document.getElementById('play_pause')
+  let buttonClass = button.className
+
+  if (buttonClass === 'play_pause btn') {
+    return 'play'
+  } else {
+    return 'pause'
+  }
+}
+
+function switchPlayPauseButton () {
+  let button = document.getElementById('play_pause')
+  let buttonClass = button.className
+
+  if (buttonClass === 'play_pause btn') {
+    button.className = 'pause_play btn'
+  } else {
+    button.className = 'play_pause btn'
+  }
+}
 
 // fonction d'affichage des comentaires
 const getComments = async timecode => {
@@ -333,245 +446,13 @@ function testAff (mess) {
   response()
 }
 
-function response () {
-  //surligne les réponses utilisateurs ("@...")
-  let elements = document.querySelectorAll('p, span')
-  for (let i = 0; i < elements.length; i++) {
-    elements[i].innerHTML = elements[i].innerHTML.replace(
-      /\S*@\S*/g,
-      '<mark>$&</mark>'
-    )
-  }
-}
-
-//fonction pour récupérer les commentaires du serveur firestore
-const fetchComments = async (episodeTitle) => {
-  let comments = [];
-  const querySnapshot = await getDocs(collection(db, episodeTitle));
-  querySnapshot.forEach((doc) => {
-    // console.log(doc.id, ' => ', doc.data());
-    comments.push(doc.data());
-  });
-  return comments;
-}
-
-//fonction pour récupérer les commentaires du serveur firestore
-const fetchBuffer = async () => {
-  let buffer = [];
-  chrome.storage.sync.get(null, function(items) {
-    buffer = items;
-  });  
-  return buffer;
-}
-
-
-
-
-
-chrome.tabs.query({}, function (tabs) {
-  tabs.forEach(function (tab) {
-    if (tab.url.includes('podcasts.google.com')) {
-      let previousEpisode = ''
-      var mainForForegroundPort = chrome.tabs.connect(tab.id, { name: 'main_connection_for_foreground' })
-      var podcastInformationsPort = chrome.tabs.connect(tab.id, { name: 'podcast_informations' })
-      var playerActionsPort = chrome.tabs.connect(tab.id, { name: 'main_orders_for_foreground' })
-
-      podcastInformationsPort.onMessage.addListener(function (msg) {
-        currentData.episode.title = msg.episodeTitle
-        currentData.episode.rssUrl = msg.podcastRssUrl
-        updtateEpisodeTitle(currentData.episode.title)
-        
-        // Detect episode change
-        if (previousEpisode != msg.episodeTitle) {
-          updateBuffer(currentData.episode.title)
-        }
-        previousEpisode = msg.episodeTitle
-
-        updateLecture(msg.lecture)
-
-        currentData.timecode.startingTime = msg.startingTime
-        currentData.timecode.endingTime = msg.endingTime
-        updateTimeCode(
-          currentData.timecode.startingTime,
-          currentData.timecode.endingTime
-        )
-      })
-
-      document.querySelector('#minus_ten').addEventListener('click', () => {
-        playerActionsPort.postMessage({ order: 'click_minus_ten' })
-      })
-
-      document.querySelector('#play_pause').addEventListener('click', () => {
-        playerActionsPort.postMessage({ order: 'click_play_pause' })
-      })
-
-      document.querySelector('#plus_thirty').addEventListener('click', () => {
-        playerActionsPort.postMessage({ order: 'click_plus_thirty' })
-      })
-    }
-  })
-})
-
-
-
-
-
-function updateBuffer(episodeTitle) {
-  let bufferSize
-  let bufferLimit = 3;
-  let episodeAleradyExist = false;
-  let commentsBuffer = [];
-
-  chrome.storage.sync.get(null, function(items) {
-    commentsBuffer = Object.keys(items);
-    bufferSize = commentsBuffer.length;
-    
-    if (bufferSize > 0) {
-      for (var i = 0; i < bufferSize; i++) {
-        if (commentsBuffer[i] == episodeTitle) {
-          episodeAleradyExist = true;
-        }
-      }
-    } else {
-      episodeAleradyExist = false;
-    }
-
-    if (!episodeAleradyExist) {
-      // console.log("FETCH DATA FROM FIRESTORE")
-      fetchComments(episodeTitle).then((commentsList) => {
-        commentsBuffer.unshift({ [episodeTitle]: commentsList })
-        
-        if (bufferSize >= bufferLimit) {
-          commentsBuffer.pop(); 
-        }
-
-        chrome.storage.sync.set({ [episodeTitle]: commentsList }).then(() => {
-          // console.log("Value is set to ", commentsList);
-        });
-        
-      });
-    }
-    
-  });
-
-}
-
-
-
-
-document.querySelector('#test1').addEventListener('click', async () => {
-  console.log('TEST1')
-})
-
-function addDocFirestore() {
-  // Add a new document.
-  const docRef = addDoc(collection(db, "test"), {"test": "test"})
-  .then((result) => {
-    console.log('Document written with ID: ', result.id)
-  }).catch((err) => {
-    console.error('Error adding document: ', e)  
-  });
-}
-
-function getAllLocalStorage() {
-  // Récupérer les données du storage
-  return chrome.storage.sync.get(null, function(items) {
-    console.log(items)
-  });
-}
-
-document.querySelector('#test2').addEventListener('click', async () => {
-  console.log('TEST2')
-})
-
-document.querySelector('#test3').addEventListener('click', async () => {
-  console.log('TEST3')
-})
-
-document.querySelector('#test4').addEventListener('click', async () => {
-  
-})
-
-function clearLocalStorage() {
-  return chrome.storage.sync.clear(function() {
-    let error = chrome.runtime.lastError;
-    if (error) {
-      console.error(error);
-    }
-  })
-}
-
-document.querySelector('#btn_user_profile').addEventListener('click', () => {
-  window.location.replace('./settings.html')
-})
-
-function updateLecture (playingState) {
-  var button = document.getElementById('play_pause')
-  switch (playingState) {
-    case 'Lecture':
-      currentData.podcastIsPlaying = false
-      button.setAttribute('class', 'play_pause myButton')
-      break
-    case 'Pause':
-      currentData.podcastIsPlaying = true
-      button.setAttribute('class', 'pause_play myButton')
-      break
-    default:
-      break
-  }
-}
-
-function updtateEpisodeTitle (episodeTitle) {
-  var myElement = document.getElementsByClassName('episodeTitle')[0]
-  myElement.innerHTML = episodeTitle
-}
-
-function updateTimeCode (startingTime, endingTime) {
-  var myElement = document.getElementsByClassName('current_timecode')[0]
-  myElement.innerHTML = startingTime + ' / ' + endingTime
-}
-
-
-
-let previousCommentsList = [];
-let currentCommentsList = [];
-
-chrome.runtime.onConnect.addListener(function (port) {
-  if (port.name === "comments_from_background") {
-    console.log("main.js - port received : ", port);
-    
-    port.onMessage.addListener(function (msg) {
-      console.log("main.js - Message received from " + port.name + " : ", msg);
-      
-      // TODO : Mettre à jour la popup avec une fonction qui va afficher les nouveaux commentaires
-      currentCommentsList = msg.comments;
-    });
-
-    port.onDisconnect.addListener(function() {
-      console.log("main.js - background.js n'est plus actif.");
-    });
+onAuthStateChanged(getAuth(firebaseApp), user => {
+  if (user != null) {
+    currentUser = user
+    currentData.userIsLoggedIn = true
+    // console.log('Below User is logged in : ', user)
+  } else {
+    currentData.userIsLoggedIn = false
+    window.location.replace('./login.html')
   }
 })
-
-
-
-// PROCHAINE SESSION DE CODE
-/*
-Il faut créer une fonction qui prends une liste de commentaire et qui met à jours l'affichage des commentaires
-dans la popup.
-Il faut réorganiser les commentaires par leur timestamp.
-Ajouter la notion de timestamp dans les data des commentaires.
-Ensuite on détecte les nouveaux commentaires à afficher et on les ajoutes à la suite de la liste des commentaires
-
-Et ensuite il faut faire fonctionner correctement le publish button pour envoyer les commentaires à la base de donnés
-
-Revoir la structure de la base de donnés pour qu'elle soit plus simple à utiliser avec une collections Podcasts, un collection Episodes
-dans laquelle on trouvera un objet : 
-{
-  "episodeId": "21873428174891248",
-  "podcastTitle": "Le podcast de la mort qui tue",
-  "comments": [],
-}
-
-surtout revoir la strucutre pour qu'on ait pas beaucoup de collections au lieu d'avoir une collection par épisode
-*/
