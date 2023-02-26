@@ -1,5 +1,7 @@
+console.log("FG ready !")
+
 // =========== IMPORTS =========
-import { firebaseApp, db } from '../popup_views/firebase_config'
+import { firebaseApp, db } from '../firebase_config'
 
 // =============================
 // ========== VARIABLES ========

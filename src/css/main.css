@@ -1,19 +1,17 @@
 /* FONTS */
-/* FONTS */
-/* FONTS */
 @font-face {
   font-family: 'Rubik';
   src: url(../fonts/Rubik-VariableFont_wght.ttf);
 }
 
-/* HTML PAGE */
-/* HTML PAGE */
+
 /* HTML PAGE */
 html {
   width: 300px;
   height: 350px;
   display: flex;
   flex-direction: column;
+  
   background: #9971FF;
 }
 
@@ -41,6 +39,7 @@ body {
   letter-spacing: 0.01em;
   color: #FFFFFF;
 }
+
 #btn_user_profile {
   position: absolute;
   right: 10px;

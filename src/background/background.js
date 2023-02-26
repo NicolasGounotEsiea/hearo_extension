@@ -1,6 +1,8 @@
+console.log("BG ready !")
+
 // =========== IMPORTS =========
-import { firebaseApp, db } from '../popup_views/firebase_config'
-import { onSnapshot, collection, getDocs } from 'firebase/firestore'
+import { firebaseApp, db } from '../firebase_config'
+import { onSnapshot, collection } from 'firebase/firestore'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 
 // ========== VARIABLES ========
@@ -12,7 +14,6 @@ let currentEpisode = {
   rssUrl: '',
   comments: []
 }
-
 let previousEpisode = {
   startingTime: '',
   endingTime: '',
@@ -21,29 +22,27 @@ let previousEpisode = {
   rssUrl: '',
   comments: []
 }
-
 let currentOnSnapshot = null
-
 let commentsPort = null
 let ordersForForeground = null
 let mainPort = null
-
 let foregroundTabId = null
-
 let allCommentsHasBeenSent = false
 let mainIsActive = false
 let foregroundIsActive = false
-
 let currentUser = null
 
 // ============ CODE ===========
 onAuthStateChanged(getAuth(firebaseApp), user => {
   if (user != null) {
     currentUser = user
-    chrome.storage.sync.set({ 'isUserLogIn': 'Yes' });
+    chrome.storage.local.set({ 'currentUser': currentUser });
+    chrome.storage.sync.set({ 'userIsLogin': true });
+    console.log('User is logged in')
   } else {
     currentUser = null
-    chrome.storage.sync.set({ 'isUserLogIn': 'No' });
+    chrome.storage.local.set({ 'currentUser': currentUser });
+    chrome.storage.sync.set({ 'userIsLogin': false });
   }
 })
 
@@ -61,9 +60,8 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       })
       .then(() => {
         foregroundTabId = tabId
-        chrome.storage.sync.set({ 'foregroundTabId': tabId });
         chrome.storage.sync.set({ 'isForegroundInjected': true });
-        console.log('✅ - FG injected.')
+        chrome.storage.sync.set({ 'foregroundTabId': tabId });
       })
       .catch(err => console.log(err))
   }
@@ -228,6 +226,11 @@ function launchOnSnapshot () {
 }
 
 // =========== IDEAS ===========
+/*
+TODO important : réussir à trier les commentaires par timecode avec le plus grand en premier
+TODO important : réussir à envoyer tous les commentaires apres le timecode actuel à la popup
+*/
+
 /*
 TODO pas important : Un fonction qui détecte s'il y a plusieurs onglets ouverts avec 
 le site podcasts.google.com pour envoyer un message à la popup et 

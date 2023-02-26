@@ -9,32 +9,26 @@ module.exports = {
   // Using module bundlers we can add the required code for your extension
   // Any modular script should be added as entry point
   entry: {
-    firebase_config: './src/popup_views/firebase_config.js',
+    firebase_config: './src/firebase_config.js',
     login: './src/popup_views/login/login.js',
     main: './src/popup_views/main/main.js',
     content_script: './src/content/content-script.js',
     content: './src/content/content.js',
     foreground: './src/content/foreground.js',
-    settings_script: './src/popup_views/settings/settings-script.js',
-    options: './src/options/options.js',
+    settings_script: './src/popup_views/settings/settings.js',
     wrong_tab: './src/popup_views/wrong_tab/wrong_tab.js',
     background: './src/background/background.js',
   },
   plugins: [
     new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
-    new HtmlWebpackPlugin({
-      template: path.join(__dirname, "src", "popup_views", "login", "login.html"),
-      filename: "login.html",
-      chunks: ["login"] // This is script from entry point
-    }),
     // Note: you can add as many new HtmlWebpackPlugin objects  
     // filename: being the html filename
     // chunks: being the script src
     // if the script src is modular then add it as the entry point above
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, "src", "options", "options.html"),
-      filename: "options.html",
-      chunks: ["options"] // This is script from entry point
+      template: path.join(__dirname, "src", "popup_views", "login", "login.html"),
+      filename: "login.html",
+      chunks: ["login"] // This is script from entry point
     }),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "src", "popup_views", "main", "main.html"),
@@ -59,7 +53,6 @@ module.exports = {
         { from: './src/background/background.js' },
         { from: './src/css/*' },
         { from: './src/fonts/*' },
-        { from: './src/popup_views/main/database.json' }
       ],
     }),
   ],

@@ -1,31 +1,18 @@
-// *************************************************************
-// *************************************************************
-console.log('------------ MAINS-CRIPT.JS IS LOADED ------------')
-// *************************************************************
-// *************************************************************
+console.log('MAIN ready !')
 
-var timecode = 0
-var userid
-import * as firebase from 'firebase/app'
-import { firebaseApp, db } from '../firebase_config'
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
+// =========== IMPORTS =========
+import { db, firebaseApp } from '../../firebase_config'
 import {
-  doc,
+  getFirestore,
   onSnapshot,
   addDoc,
   collection,
   getDocs
 } from 'firebase/firestore'
 
-const {
-  initializeApp,
-  applicationDefault,
-  cert
-} = require('../firebase_config')
-const { getFirestore, Timestamp, FieldValue } = require('../firebase_config')
-import 'firebase/database'
-
-//VARIABLES GLOBALES
+// ========== VARIABLES ========
+var timecode = 0
+var userid
 let comment = ''
 let mess = ''
 let limite = 10 //limite de message du chat
@@ -75,16 +62,29 @@ let currentData = {
   }
 }
 
-
-// detect when main.html is completely load
+// ============ CODE ===========
 document.addEventListener('DOMContentLoaded', function () {
-  console.log('main.js - DOMContentLoaded')
+  console.log('firebaseApp : ', firebaseApp)
 
-  chrome.storage.sync.get(['isUserLogIn'], function (data) {
-    if (data.isUserLogIn === 'No') {
-      window.location.replace('./login.html')
-    }
-  });
+  console.log('DB : ', db)
+  console.log('getFirestore(firebaseApp) : ', getFirestore(firebaseApp))
+
+  console.log(
+    "collection(db, 'Une longue inspiration') : ",
+    collection(db, 'Une longue inspiration')
+  )
+
+  chrome.storage.local.get(['currentUser'], function (data) {
+    currentUser = data.currentUser
+  })
+
+  setTimeout(() => {
+    chrome.storage.sync.get(['userIsLogin'], function (data) {
+      if (!data.userIsLogin) {
+        window.location.replace('./login.html')
+      }
+    })
+  }, 7000);
 
   document.querySelector('#btn_user_profile').addEventListener('click', () => {
     window.location.replace('./settings.html')
@@ -99,19 +99,21 @@ document.addEventListener('DOMContentLoaded', function () {
       textArea.placeholder = ' votre commentaire'
       textArea.style.setProperty('color', 'black')
       textArea.style.setProperty('background-color', 'white')
-      
+
       commentObjectToSend = {
         podcastEpisode: currentData.episode,
         timecode: currentData.timecode.startingTime,
-        userName: currentUser.displayName,
-        userId: currentUser.uid,
+        userName: currentUser != null ? currentUser.displayName : '',
+        userId: currentUser != null ? currentUser.uid : '',
         comment: userComment,
         private: toggleStatus
       }
       commentObjectToSend.comment = cleanBadWords(commentObjectToSend.comment)
-      
+
+      console.log('currentData.episode.title : ', currentData.episode.title)
+      console.log('commentObjectToSend : ', commentObjectToSend)
       addDocFirestore(currentData.episode.title, commentObjectToSend)
-      
+
       textArea.value = ''
     } else {
       updateStyleForEmptyComment(textArea)
@@ -133,46 +135,15 @@ document.addEventListener('DOMContentLoaded', function () {
 })
 
 mainPort.onMessage.addListener(function (msg) {
-  updateTimeCode(msg.startingTime, msg.endingTime)
-  updtateEpisodeTitle(msg.title)
+  currentData.userIsLoggedIn = msg.userIsLoggedIn
+  currentData.podcastIsPlaying = msg.podcastIsPlaying
+  currentData.timecode.startingTime = msg.startingTime
+  currentData.timecode.endingTime = msg.endingTime
+  currentData.episode.title = msg.title
+  currentData.episode.rssUrl = msg.rssUrl
+
+  updatePopupPlayer(msg.title, msg.startingTime, msg.endingTime)
   updateLecture(msg.isPlaying)
-})
-
-document.querySelector('#test1').addEventListener('click', async () => {
-  console.log('CLICK1')
-
-  let commentsReceived = {
-    episodeTitle: 'my episode title',
-    rssUrl: 'my url',
-    comments: [
-      {
-        comment: 'my comment',
-        timecode: '00:14'
-      },
-      {
-        comment: 'my comment2',
-        timecode: '00:24'
-      },
-      {
-        comment: 'my comment3',
-        timecode: '01:34'
-      }
-    ]
-  }
-
-  // chrome.tabs.sendMessage(tab.id, {greeting: "hello"});
-})
-
-document.querySelector('#test2').addEventListener('click', async () => {
-  console.log('CLICK2')
-})
-
-document.querySelector('#test3').addEventListener('click', async () => {
-  console.log('CLICK3')
-})
-
-document.querySelector('#test4').addEventListener('click', async () => {
-  console.log('CLICK4')
 })
 
 chrome.runtime.onConnect.addListener(function (port) {
@@ -212,31 +183,6 @@ const fetchComments = async episodeTitle => {
   return comments
 }
 
-function clearLocalStorage () {
-  return chrome.storage.sync.clear(function () {
-    let error = chrome.runtime.lastError
-    if (error) {
-      console.error(error)
-    }
-  })
-}
-
-function getAllLocalStorage () {
-  // Récupérer les données du storage
-  return chrome.storage.sync.get(null, function (items) {
-    console.log(items)
-  })
-}
-
-//fonction pour récupérer les commentaires du serveur firestore
-const fetchBuffer = async () => {
-  let buffer = []
-  chrome.storage.sync.get(null, function (items) {
-    buffer = items
-  })
-  return buffer
-}
-
 function updateLecture (playingState) {
   let button = document.getElementById('play_pause')
   switch (playingState) {
@@ -253,14 +199,11 @@ function updateLecture (playingState) {
   }
 }
 
-function updtateEpisodeTitle (episodeTitle) {
-  let myElement = document.getElementsByClassName('episodeTitle')[0]
-  myElement.innerHTML = episodeTitle
-}
-
-function updateTimeCode (startingTime, endingTime) {
-  let myElement = document.getElementsByClassName('current_timecode')[0]
-  myElement.innerHTML = startingTime + ' / ' + endingTime
+function updatePopupPlayer (episodeTitle, startingTime, endingTime) {
+  let myEpisodeTitleElement = document.getElementsByClassName('episodeTitle')[0]
+  let myTimecodeElement = document.getElementsByClassName('current_timecode')[0]
+  myEpisodeTitleElement.innerHTML = episodeTitle
+  myTimecodeElement.innerHTML = startingTime + ' / ' + endingTime
 }
 
 const updateStyleForEmptyComment = textArea => {
@@ -280,15 +223,14 @@ const cleanBadWords = comment => {
 }
 
 const addDocFirestore = async (collectionName, data) => {
-  if (collectionName !== "" && data !== "") {
-    const docRef = addDoc(collection(db, collectionName), data)
-    .then(result => {
-      console.log('Document written with ID: ', result.id)
-    })
-    .catch(err => {
-      console.error('Error adding document: ', e)
-    })
-    console.log('Document written with ID: ', docRef.id)
+  if (collectionName !== '' && data !== null) {
+    addDoc(collection(db, collectionName), data)
+      .then(result => {
+        console.log('Document written with ID: ', result.id)
+      })
+      .catch(err => {
+        console.error('Error adding document: ', err)
+      })
   }
 }
 
@@ -446,13 +388,8 @@ function testAff (mess) {
   response()
 }
 
-onAuthStateChanged(getAuth(firebaseApp), user => {
-  if (user != null) {
-    currentUser = user
-    currentData.userIsLoggedIn = true
-    // console.log('Below User is logged in : ', user)
-  } else {
-    currentData.userIsLoggedIn = false
-    window.location.replace('./login.html')
-  }
-})
+// =========== IDEAS ===========
+/*
+TODO : créer une fonction qui prends un commentaire en paramètre et qui l'affiche
+TODO : créer une fonction qui prends une liste de commentaire en paramètre et qui les affiche dans le bonne ordre
+*/

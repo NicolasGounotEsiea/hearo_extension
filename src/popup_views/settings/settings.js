@@ -4,7 +4,7 @@ console.log("------------ SETTINGS-SCRIPT.JS IS LOADED ------------");
 // *************************************************************
 // *************************************************************
 
-import { firebaseApp } from '../firebase_config'
+import { firebaseApp } from '../../firebase_config'
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 const auth = getAuth(firebaseApp); // Auth instance for the current firebaseApp
@@ -24,5 +24,6 @@ document.querySelector('#sign_out').addEventListener('click', () => {
 });
 
 document.querySelector('#back').addEventListener('click', () => {
+  console.log('Back to main.html ...');
   window.location.replace('./main.html');
 });

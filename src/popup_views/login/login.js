@@ -1,10 +1,6 @@
-// *************************************************************
-// *************************************************************
-console.log('------------ LOGIN.JS IS LOADED ------------')
-// *************************************************************
-// *************************************************************
+console.log('LOGIN ready !')
 
-import { firebaseApp } from '../firebase_config'
+import { firebaseApp } from '../../firebase_config'
 import {
   getAuth,
   onAuthStateChanged,
@@ -13,8 +9,6 @@ import {
   setPersistence,
   browserLocalPersistence
 } from 'firebase/auth'
-
-var isConnected = false
 
 const auth = getAuth(firebaseApp) // Auth instance for the current firebaseApp
 setPersistence(auth, browserLocalPersistence) // To keep user signin localy
@@ -28,12 +22,10 @@ function initFirebaseApp () {
   console.log('Detect auth state...')
   onAuthStateChanged(auth, user => {
     if (user != null) {
-      isConnected = true
       console.log('Logged in and current user is : ', user)
-      chrome.storage.sync.set({ 'isUserLogIn': 'Yes' });
+      chrome.storage.sync.set({ 'userIsLogin': true });
       window.location.replace('./main.html')
     } else {
-      isConnected = false
       console.log('No user then start the sign-in process :')
       startSignIn()
     }
@@ -49,7 +41,7 @@ function startSignIn () {
     auth.signOut()
   } else {
     console.log('proceed')
-    chrome.storage.sync.set({ 'isUserLogIn': 'No' });
+    chrome.storage.sync.set({ 'userIsLogin': false });
     startAuth(true)
   }
 }
@@ -59,25 +51,25 @@ function startAuth (interactive) {
   chrome.identity.getAuthToken({ interactive: true }, function (token) {
     if (chrome.runtime.lastError && !interactive) {
       console.log('It was not possible to get a token programmatically.')
-      chrome.storage.sync.set({ 'isUserLogIn': 'No' });
+      chrome.storage.sync.set({ 'userIsLogin': false });
     } else if (chrome.runtime.lastError) {
       console.error('chrome.runtime.lastError : ', chrome.runtime.lastError)
-      chrome.storage.sync.set({ 'isUserLogIn': 'No' });
+      chrome.storage.sync.set({ 'userIsLogin': false });
     } else if (token) {
       const credential = GoogleAuthProvider.credential(null, token)
       signInWithCredential(auth, credential)
         .then(result => {
           console.log('Success!!! -- result : ', result)
-          chrome.storage.sync.set({ 'isUserLogIn': 'Yes' });
+          chrome.storage.sync.set({ 'userIsLogin': true });
           window.location.replace('./main.html')
         })
         .catch(error => {
-          chrome.storage.sync.set({ 'isUserLogIn': 'No' });
+          chrome.storage.sync.set({ 'userIsLogin': false });
           console.log(error)
         })
     } else {
       console.error('The OAuth token was null')
-      chrome.storage.sync.set({ 'isUserLogIn': 'No' });
+      chrome.storage.sync.set({ 'userIsLogin': false });
     }
   })
 }

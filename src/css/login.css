@@ -1,91 +1,121 @@
-body {
-  position: inherit;
-  display: block;
-  flex-direction: column;
-  justify-content: center;
-  background: #9971FF;
-  font-family: "Lato", sans-serif;
-  width: 300px;
-  height: 400px;
+/* FONTS */
+@font-face {
+  font-family: 'Rubik';
+  src: url(../fonts/Rubik-VariableFont_wght.ttf);
 }
 
+/* HTML PAGE */
+html {
+  width: 300px;
+  height: 350px;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  background: #9971FF;
+  /* border: 2px solid red; */
+}
 
-h3{
-  position: absolute;
-  width: 37px;
-  height: 12px;
-  left: calc(50% - 37px/2);
-  top: 0px;
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  margin: 0px;
+  height: 100%;
+  width: 100%;
+  /* border: 2px solid blue; */
+}
 
-  font-family: Helvetica;
-  font-style: normal;
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 20px;
+  margin: 5px;
+  /* border: 2px solid red; */
+}
+.title {
+  font-family: 'Rubik', sans-serif;
   font-weight: 900;
   font-size: 10px;
-  line-height: 12px;
-  /* identical to box height */
-
-  display: flex;
-  align-items: center;
-  text-align: center;
-  letter-spacing: 0.10em;
-
+  letter-spacing: 0.01em;
   color: #FFFFFF;
 }
 
-
-.login-with-google-btn {
-  
-  transition: background-color .3s, box-shadow .3s;
-    
-  padding: 12px 16px 12px 42px;
-  border: none;
-  border-radius: 3px;
-  box-shadow: 0 -1px 0 rgba(0, 0, 0, .04), 0 1px 1px rgba(0, 0, 0, .25);
-  
-  color: #757575;
-  font-size: 14px;
-  font-weight: 500;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans","Helvetica Neue",sans-serif;
-  
-  background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMTcuNiA5LjJsLS4xLTEuOEg5djMuNGg0LjhDMTMuNiAxMiAxMyAxMyAxMiAxMy42djIuMmgzYTguOCA4LjggMCAwIDAgMi42LTYuNnoiIGZpbGw9IiM0Mjg1RjQiIGZpbGwtcnVsZT0ibm9uemVybyIvPjxwYXRoIGQ9Ik05IDE4YzIuNCAwIDQuNS0uOCA2LTIuMmwtMy0yLjJhNS40IDUuNCAwIDAgMS04LTIuOUgxVjEzYTkgOSAwIDAgMCA4IDV6IiBmaWxsPSIjMzRBODUzIiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNNCAxMC43YTUuNCA1LjQgMCAwIDEgMC0zLjRWNUgxYTkgOSAwIDAgMCAwIDhsMy0yLjN6IiBmaWxsPSIjRkJCQzA1IiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNOSAzLjZjMS4zIDAgMi41LjQgMy40IDEuM0wxNSAyLjNBOSA5IDAgMCAwIDEgNWwzIDIuNGE1LjQgNS40IDAgMCAxIDUtMy43eiIgZmlsbD0iI0VBNDMzNSIgZmlsbC1ydWxlPSJub256ZXJvIi8+PHBhdGggZD0iTTAgMGgxOHYxOEgweiIvPjwvZz48L3N2Zz4=);
-  background-color: white;
-  background-repeat: no-repeat;
-  background-position: 12px 11px;
-  margin: 0 auto;
-  
- 
-}
-
-.parent-arrow {
+.content {
   display: flex;
+  flex-direction: column;
   justify-content: center;
-}
-.container{
-  display: flex;
-  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 60px;
+  /* border: 2px solid red; */
 }
 
-.text{
+.elements {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: auto;
+  height: auto;
+  /* border: 2px solid blue; */
+}
+
+.down_arrow {
+  height: 41px;
+  width: 41px;
+  /* border: 2px solid red; */
+}
+
+.description {
   vertical-align: middle;
   text-align: center;
-  padding-bottom: 10px;
-  padding-top: 50px;
-  position: inherit;
-  display: flex;
-  justify-content: center;
-  color: white;
-  font-family: Cambria, serif;
-  font-size: large;
+  font-family: 'Rubik';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 19px;
+  text-align: center;
+  color: #FFFFFF;
+  width: 190px;
+  margin-bottom: 20px;
+  /* border: 2px solid red; */
 }
 
 
 
+/* CSS */
+#signin_google {
+  margin-top: 20px;
+  
+  width: 160px;
+  height: 38px;
+  background-image: url(../icons/btn_google_dark.png);
+  background-color: transparent;
+  background-size: cover;
 
+  border: 1px solid transparent;
+  box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
+  cursor: pointer;
+  
+  transition: all 250ms;
+}
 
+#signin_google:focus {
+  box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+}
 
+#signin_google:hover {
+  box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+  transform: translateY(-1px);
+}
 
-
-
-
-
-
+#signin_google:active {
+  box-shadow: rgba(0, 0, 0, .06) 0 2px 4px;
+  transform: translateY(0);
+}
