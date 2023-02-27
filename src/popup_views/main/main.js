@@ -69,18 +69,13 @@ let currentData = {
 
 let ordersForFg = null
 
+
+
 // ============ CODE ===========
 document.addEventListener('DOMContentLoaded', function () {
 
-  chrome.storage.local.get(['currentUser'], function (data) {
-    currentUser = data.currentUser
-  })
-
-  chrome.storage.sync.get(['userIsLogin'], function (data) {
-    if (!data.userIsLogin) {
-      window.location.replace('./login.html')
-    }
-  })
+  currentUser = getCurrentUser()
+  checkUserLogin()
 
   chrome.storage.local.get(['foregroundTabId'], function (data) {
     console.log('foregroundTabId : ', data.foregroundTabId)
@@ -90,12 +85,12 @@ document.addEventListener('DOMContentLoaded', function () {
       document.querySelector('#minus_ten').addEventListener('click', () => {
         ordersForFg.postMessage({ order: 'click_minus_ten' })
       })
-    
+
       document.querySelector('#play_pause').addEventListener('click', () => {
         switchPlayPauseButton()
         ordersForFg.postMessage({ order: 'click_play_pause' })
       })
-    
+
       document.querySelector('#plus_thirty').addEventListener('click', () => {
         ordersForFg.postMessage({ order: 'click_plus_thirty' })
       })
@@ -165,43 +160,20 @@ chrome.runtime.onConnect.addListener(function (port) {
   }
 })
 
-function updateCurrentData(msgReceived) {
-    
-  if (currentData.episode.title === '' && previousEpisodeTitle === '' & currentEpisodeTitle === '') {
-    currentEpisodeTitle = currentData.episode.title
+// ==================================
+// ============ FONCTIONS ===========
+function checkUserLogin() {
+  chrome.storage.sync.get(['userIsLogin'], function (data) {
+    if (!data.userIsLogin) {
+      window.location.replace('./login.html')
+    }
+  })
+}
 
-    currentData.timecode.startingTime = msgReceived.startingTime
-    currentData.timecode.endingTime = msgReceived.endingTime
-    currentData.podcastIsPlaying = msgReceived.lecture
-    currentData.episode.title = msgReceived.title
-    currentData.episode.rssUrl = msgReceived.rssUrl
-
-    launchOnSnapshot()
-  } else if (
-    msgReceived.title !== currentData.episode.title &&
-    currentData.episode.title !== ''
-  ) {
-    previousEpisodeTitle = currentData.episode.title
-
-    currentData.timecode.startingTime = msgReceived.startingTime
-    currentData.timecode.endingTime = msgReceived.endingTime
-    currentData.podcastIsPlaying = msgReceived.lecture
-    currentData.episode.title = msgReceived.title
-    currentData.episode.rssUrl = msgReceived.rssUrl
-
-    currentEpisodeTitle = currentData.episode.title
-
-    launchOnSnapshot()
-  } else if (currentData.episode.title === previousEpisodeTitle) {
-    currentEpisodeTitle = currentData.episode.title
-
-    currentEpisode.startingTime = msgReceived.startingTime
-    currentEpisode.endingTime = msgReceived.endingTime
-    currentEpisode.isPlaying = msgReceived.lecture
-  }
-
-  console.log("previous episode : " + previousEpisodeTitle)
-  console.log("current episode : " + currentEpisodeTitle)
+function getCurrentUser() {
+  chrome.storage.local.get(['currentUser'], function (data) {
+    return data.currentUser
+  })
 }
 
 function response () {
@@ -291,7 +263,6 @@ function getPlayPauseOrder () {
 function switchPlayPauseButton () {
   let button = document.getElementById('play_pause')
   let buttonClass = button.className
-
   if (buttonClass === 'play_pause btn') {
     button.className = 'pause_play btn'
   } else {

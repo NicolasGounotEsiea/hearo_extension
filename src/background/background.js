@@ -49,8 +49,6 @@ onAuthStateChanged(getAuth(firebaseApp), user => {
 // TODO : lancer wrong_tab.html si l'utilisateur n'a pas d'onglet google podcast
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  chrome.storage.sync.set({ 'isForegroundInjected': false });
-  chrome.storage.sync.set({ 'foregroundTabId': 0 });
   if (
     tab.url.includes('podcasts.google.com') &&
     changeInfo.status === 'complete'
@@ -62,6 +60,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       })
       .then(() => {
         foregroundTabId = tabId
+        chrome.storage.local.set({ 'foregroundTabId': foregroundTabId });
         chrome.storage.sync.set({ 'isForegroundInjected': true });
       })
       .catch(err => console.log(err))
@@ -70,8 +69,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
 chrome.runtime.onConnect.addListener(function (port) {
   if (port.name === 'data_player_fg_to_bg') {
-    chrome.storage.local.set({ 'foregroundTabId': port.sender.tab.id });
-    console.log("port id : ", port.sender.tab.id)
     foregroundIsActive = true
     
     port.onMessage.addListener(function (msg) {
@@ -92,22 +89,6 @@ chrome.runtime.onConnect.addListener(function (port) {
 
     port.onDisconnect.addListener(function () {
       foregroundIsActive = false
-    })
-  }
-})
-
-chrome.runtime.onConnect.addListener(function (port) {
-  if (port.name === 'orders_from_main') {
-    ordersForForeground = chrome.tabs.connect(foregroundTabId, {
-      name: 'orders_from_bg'
-    })
-
-    port.onMessage.addListener(function (msg) {
-      if (foregroundIsActive) ordersForForeground.postMessage(msg.order)
-    })
-
-    port.onDisconnect.addListener(function () {
-      console.log('orders_from_main disconnected')
     })
   }
 })
