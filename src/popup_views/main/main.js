@@ -31,6 +31,9 @@ let currentUser = null
 let previousCommentsList = []
 let currentCommentsList = []
 
+let previousEpisodeTitle = ""
+let currentEpisodeTitle = ""
+
 let commentObjectToSend = {
   podcastEpisode: {},
   timecode: '',
@@ -78,13 +81,11 @@ document.addEventListener('DOMContentLoaded', function () {
     currentUser = data.currentUser
   })
 
-  setTimeout(() => {
-    chrome.storage.sync.get(['userIsLogin'], function (data) {
-      if (!data.userIsLogin) {
-        window.location.replace('./login.html')
-      }
-    })
-  }, 7000);
+  chrome.storage.sync.get(['userIsLogin'], function (data) {
+    if (!data.userIsLogin) {
+      window.location.replace('./login.html')
+    }
+  })
 
   document.querySelector('#btn_user_profile').addEventListener('click', () => {
     window.location.replace('./settings.html')
@@ -135,6 +136,8 @@ document.addEventListener('DOMContentLoaded', function () {
 })
 
 mainPort.onMessage.addListener(function (msg) {
+  console.log("Message reçu : ", msg)
+  
   currentData.userIsLoggedIn = msg.userIsLoggedIn
   currentData.podcastIsPlaying = msg.podcastIsPlaying
   currentData.timecode.startingTime = msg.startingTime
@@ -160,6 +163,45 @@ chrome.runtime.onConnect.addListener(function (port) {
     })
   }
 })
+
+function updateCurrentData(msgReceived) {
+    
+  if (currentData.episode.title === '' && previousEpisodeTitle === '' & currentEpisodeTitle === '') {
+    currentEpisodeTitle = currentData.episode.title
+
+    currentData.timecode.startingTime = msgReceived.startingTime
+    currentData.timecode.endingTime = msgReceived.endingTime
+    currentData.podcastIsPlaying = msgReceived.lecture
+    currentData.episode.title = msgReceived.title
+    currentData.episode.rssUrl = msgReceived.rssUrl
+
+    launchOnSnapshot()
+  } else if (
+    msgReceived.title !== currentData.episode.title &&
+    currentData.episode.title !== ''
+  ) {
+    previousEpisodeTitle = currentData.episode.title
+
+    currentData.timecode.startingTime = msgReceived.startingTime
+    currentData.timecode.endingTime = msgReceived.endingTime
+    currentData.podcastIsPlaying = msgReceived.lecture
+    currentData.episode.title = msgReceived.title
+    currentData.episode.rssUrl = msgReceived.rssUrl
+
+    currentEpisodeTitle = currentData.episode.title
+
+    launchOnSnapshot()
+  } else if (currentData.episode.title === previousEpisodeTitle) {
+    currentEpisodeTitle = currentData.episode.title
+
+    currentEpisode.startingTime = msgReceived.startingTime
+    currentEpisode.endingTime = msgReceived.endingTime
+    currentEpisode.isPlaying = msgReceived.lecture
+  }
+
+  console.log("previous episode : " + previousEpisodeTitle)
+  console.log("current episode : " + currentEpisodeTitle)
+}
 
 function response () {
   //surligne les réponses utilisateurs ("@...")

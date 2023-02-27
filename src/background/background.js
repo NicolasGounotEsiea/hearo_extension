@@ -46,6 +46,8 @@ onAuthStateChanged(getAuth(firebaseApp), user => {
   }
 })
 
+// TODO : lancer wrong_tab.html si l'utilisateur n'a pas d'onglet google podcast
+
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   chrome.storage.sync.set({ 'isForegroundInjected': false });
   chrome.storage.sync.set({ 'foregroundTabId': null });
@@ -208,20 +210,20 @@ function launchOnSnapshot () {
     }
 
     // TODO : uncomment this code when firestore rules pblm fixed
-    // if (currentUser !== null) {
-    //   let collRef = collection(db, currentEpisode.title, currentUser.uid)
-    //   currentOnSnapshot = onSnapshot(collRef, snapshot => {
-    //     if (!snapshot.empty) {
-    //       snapshot.forEach(doc => {
-    //         commentsList.push(doc.data())
-    //       })
-    //       currentEpisode.comments = commentsList
-    //       console.log('Current comments list : ' + currentEpisode.comments)
-    //     } else {
-    //       console.log('Collection empty for : ' + currentEpisode.title)
-    //     }
-    //   })
-    // }
+    if (currentUser !== null) {
+      let collRef = collection(db, currentEpisode.title)
+      currentOnSnapshot = onSnapshot(collRef, snapshot => {
+        if (!snapshot.empty) {
+          snapshot.forEach(doc => {
+            commentsList.push(doc.data())
+          })
+          currentEpisode.comments = commentsList
+          console.log('Current comments list : ', currentEpisode.comments)
+        } else {
+          console.log('Collection empty for : ' + currentEpisode.title)
+        }
+      })
+    }
   }
 }
 

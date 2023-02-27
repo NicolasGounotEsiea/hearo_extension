@@ -30,6 +30,10 @@
     "128": "./src/icons/logo128.png"
   },
 
+  "host_permissions": [
+    "https://podcasts.google.com/"
+  ],
+
   "web_accessible_resources": [
     {
       "resources": [
