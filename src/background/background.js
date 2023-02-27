@@ -50,7 +50,7 @@ onAuthStateChanged(getAuth(firebaseApp), user => {
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   chrome.storage.sync.set({ 'isForegroundInjected': false });
-  chrome.storage.sync.set({ 'foregroundTabId': null });
+  chrome.storage.sync.set({ 'foregroundTabId': 0 });
   if (
     tab.url.includes('podcasts.google.com') &&
     changeInfo.status === 'complete'
@@ -63,7 +63,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       .then(() => {
         foregroundTabId = tabId
         chrome.storage.sync.set({ 'isForegroundInjected': true });
-        chrome.storage.sync.set({ 'foregroundTabId': tabId });
       })
       .catch(err => console.log(err))
   }
@@ -71,6 +70,8 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
 chrome.runtime.onConnect.addListener(function (port) {
   if (port.name === 'data_player_fg_to_bg') {
+    chrome.storage.local.set({ 'foregroundTabId': port.sender.tab.id });
+    console.log("port id : ", port.sender.tab.id)
     foregroundIsActive = true
     
     port.onMessage.addListener(function (msg) {
@@ -210,20 +211,20 @@ function launchOnSnapshot () {
     }
 
     // TODO : uncomment this code when firestore rules pblm fixed
-    if (currentUser !== null) {
-      let collRef = collection(db, currentEpisode.title)
-      currentOnSnapshot = onSnapshot(collRef, snapshot => {
-        if (!snapshot.empty) {
-          snapshot.forEach(doc => {
-            commentsList.push(doc.data())
-          })
-          currentEpisode.comments = commentsList
-          console.log('Current comments list : ', currentEpisode.comments)
-        } else {
-          console.log('Collection empty for : ' + currentEpisode.title)
-        }
-      })
-    }
+    // if (currentUser !== null) {
+    //   let collRef = collection(db, currentEpisode.title)
+    //   currentOnSnapshot = onSnapshot(collRef, (snapshot) => {
+    //     if (!snapshot.empty) {
+    //       snapshot.forEach(doc => {
+    //         commentsList.push(doc.data())
+    //       })
+    //       currentEpisode.comments = commentsList
+    //       console.log('Current comments list : ', currentEpisode.comments)
+    //     } else {
+    //       console.log('Collection empty for : ' + currentEpisode.title)
+    //     }
+    //   })
+    // }
   }
 }
 

@@ -68,20 +68,94 @@ function clickPlayerButtons (msgOrder) {
     case 'play':
       console.log('play')
       // document.querySelector("audio").play()
-      // document.querySelector("div[jsname='IGlMSc']").click()
+      // document.getElementsByClassName("U26fgb mUbCce fKz7Od M9Bg4d")[0].click()
       break
     case 'pause':
       console.log('pause')
       // document.querySelector("audio").pause()
-      // document.querySelector("div[jsname='IGlMSc']").click()
+      // document.getElementsByClassName("U26fgb mUbCce fKz7Od M9Bg4d")[0].click()
       break
     case 'click_plus_thirty':
-      document.querySelector("div[jsname='xBcuNc']").click()
+      // document.querySelector("div[jsname='xBcuNc']").click()
       break
     case 'click_minus_ten':
-      document.querySelector("div[jsname='HQzqRc']").click()
+      // document.querySelector("div[jsname='HQzqRc']").click()
       break
     default:
       break
   }
 }
+
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+  console.log("request : ", request);
+
+  // if (request.mainViewIsOpen) {
+  //   popupMainViewIsOpen = request.mainViewIsOpen;
+  //   if (!loopIsActive) {
+  //     nonstopSendingTimecode();
+  //     loopIsActive = true;
+  //   }
+  // } else {
+  //   loopIsActive = false;
+  //   popupMainViewIsOpen = request.mainViewIsOpen;
+  // }
+  
+  // switch (request.playerAction) {
+  //   case 'click_play_pause':
+  //     console.log('PLAY PAUSE');
+  //     document.querySelector("div[jsname='IGlMSc']").click();
+  //     break;
+  //   case 'click_plus_thirty':
+  //     console.log('PLUS THIRTY');
+  //     document.querySelector("div[jsname='xBcuNc']").click();
+  //     break;
+  //   case 'click_minus_ten':
+  //     console.log('MINUS TEN');
+  //     document.querySelector("div[jsname='HQzqRc']").click();
+  //     break;
+  //   case '':
+  //     break;
+  //   default:   
+  // }
+});
+
+
+chrome.runtime.onConnect.addListener(function (port) {
+  console.log("port : ", port)
+  if (port.name === 'orders_from_main') {
+    console.log("main.js est actif.")
+
+    port.onMessage.addListener(function (msg) {
+      console.log('Message received from ' + port.name + ' : ', msg)
+      switch (msg.order) {
+        case 'click_play_pause':
+          console.log('PLAY PAUSE');
+          document.querySelector("div[jsname='IGlMSc']").click();
+          break;
+        case 'click_plus_thirty':
+          console.log('PLUS THIRTY');
+          document.querySelector("div[jsname='xBcuNc']").click();
+          break;
+        case 'click_minus_ten':
+          console.log('MINUS TEN');
+          document.querySelector("div[jsname='HQzqRc']").click();
+          break;
+        default:   
+      }
+    })
+
+    port.onDisconnect.addListener(function () {
+      console.log("main.js n'est plus actif.")
+    })
+  }
+})
+
+
+
+// (async () => {
+//   // const response = await chrome.tabs.sendMessage(tab.id, {greeting: "hello"});
+//   // do something with response here, not outside the function
+  
+// })();
+

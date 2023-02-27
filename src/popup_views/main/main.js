@@ -34,6 +34,8 @@ let currentCommentsList = []
 let previousEpisodeTitle = ""
 let currentEpisodeTitle = ""
 
+let foregroundTabId = null
+
 let commentObjectToSend = {
   podcastEpisode: {},
   timecode: '',
@@ -65,17 +67,10 @@ let currentData = {
   }
 }
 
+let ordersForFg = null
+
 // ============ CODE ===========
 document.addEventListener('DOMContentLoaded', function () {
-  console.log('firebaseApp : ', firebaseApp)
-
-  console.log('DB : ', db)
-  console.log('getFirestore(firebaseApp) : ', getFirestore(firebaseApp))
-
-  console.log(
-    "collection(db, 'Une longue inspiration') : ",
-    collection(db, 'Une longue inspiration')
-  )
 
   chrome.storage.local.get(['currentUser'], function (data) {
     currentUser = data.currentUser
@@ -84,6 +79,26 @@ document.addEventListener('DOMContentLoaded', function () {
   chrome.storage.sync.get(['userIsLogin'], function (data) {
     if (!data.userIsLogin) {
       window.location.replace('./login.html')
+    }
+  })
+
+  chrome.storage.local.get(['foregroundTabId'], function (data) {
+    console.log('foregroundTabId : ', data.foregroundTabId)
+    if (data.foregroundTabId != null) {
+      ordersForFg = chrome.tabs.connect(data.foregroundTabId, {name: 'orders_from_main'})
+
+      document.querySelector('#minus_ten').addEventListener('click', () => {
+        ordersForFg.postMessage({ order: 'click_minus_ten' })
+      })
+    
+      document.querySelector('#play_pause').addEventListener('click', () => {
+        switchPlayPauseButton()
+        ordersForFg.postMessage({ order: 'click_play_pause' })
+      })
+    
+      document.querySelector('#plus_thirty').addEventListener('click', () => {
+        ordersForFg.postMessage({ order: 'click_plus_thirty' })
+      })
     }
   })
 
@@ -120,24 +135,10 @@ document.addEventListener('DOMContentLoaded', function () {
       updateStyleForEmptyComment(textArea)
     }
   })
-
-  document.querySelector('#minus_ten').addEventListener('click', () => {
-    ordersForBg.postMessage({ order: 'click_minus_ten' })
-  })
-
-  document.querySelector('#play_pause').addEventListener('click', () => {
-    ordersForBg.postMessage({ order: getPlayPauseOrder() })
-    switchPlayPauseButton()
-  })
-
-  document.querySelector('#plus_thirty').addEventListener('click', () => {
-    ordersForBg.postMessage({ order: 'click_plus_thirty' })
-  })
 })
 
 mainPort.onMessage.addListener(function (msg) {
-  console.log("Message reçu : ", msg)
-  
+  // console.log("Message reçu : ", msg)
   currentData.userIsLoggedIn = msg.userIsLoggedIn
   currentData.podcastIsPlaying = msg.podcastIsPlaying
   currentData.timecode.startingTime = msg.startingTime
