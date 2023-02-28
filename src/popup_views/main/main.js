@@ -132,14 +132,73 @@ document.addEventListener('DOMContentLoaded', function () {
   })
 })
 
+let firstOnSnapshotLaunched = false
+
 mainPort.onMessage.addListener(function (msg) {
-  // console.log("Message reçu : ", msg)
+  let currentCommentsList
+
+  if (!firstOnSnapshotLaunched) {
+    currentOnSnapshot = onSnapshot(collection(db, msg.title), (snapshot) => {
+      if (!snapshot.empty) {
+        snapshot.forEach(doc => {
+          currentCommentsList.push(doc.data())
+        })
+      }
+    })
+    firstOnSnapshotLaunched = true
+  }
+
   currentData.userIsLoggedIn = msg.userIsLoggedIn
   currentData.podcastIsPlaying = msg.podcastIsPlaying
   currentData.timecode.startingTime = msg.startingTime
   currentData.timecode.endingTime = msg.endingTime
   currentData.episode.title = msg.title
   currentData.episode.rssUrl = msg.rssUrl
+
+  if (currentEpisodeTitle !== msg.title) {
+    firstOnSnapshotLaunched = false
+
+    currentOnSnapshot = onSnapshot(collection(db, currentEpisode.title), (snapshot) => {
+      console.log("onSnapshot launched")
+      if (!snapshot.empty) {
+        snapshot.forEach(doc => {
+          currentCommentsList.push(doc.data())
+        })
+        currentData.comments = currentCommentsList
+        console.log('Current comments list : ', currentEpisode.comments)
+      } else {
+        console.log('Collection empty for : ' + currentEpisode.title)
+      }
+    })
+  }
+    
+  
+
+
+  if (currentEpisode.title !== '') {
+    let commentsList = []
+
+    if (currentOnSnapshot !== null) {
+      currentOnSnapshot()
+      currentOnSnapshot = null
+    }
+
+    // TODO : uncomment this code when firestore rules pblm fixed
+    if (currentUser !== null) {
+      currentOnSnapshot = onSnapshot(collection(db, currentEpisode.title), (snapshot) => {
+        console.log("onSnapshot launched")
+        if (!snapshot.empty) {
+          snapshot.forEach(doc => {
+            commentsList.push(doc.data())
+          })
+          currentEpisode.comments = commentsList
+          console.log('Current comments list : ', currentEpisode.comments)
+        } else {
+          console.log('Collection empty for : ' + currentEpisode.title)
+        }
+      })
+    }
+  }
 
   updatePopupPlayer(msg.title, msg.startingTime, msg.endingTime)
   updateLecture(msg.isPlaying)
