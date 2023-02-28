@@ -5,7 +5,7 @@
     "release": "webpack --config webpack.production.js"
   },
   "dependencies": {
-    "firebase": "^9.16.0",
+    "firebase": "^9.17.1",
     "firebaseui": "^6.0.2"
   },
   "devDependencies": {
