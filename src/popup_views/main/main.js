@@ -138,30 +138,36 @@ let firstOnSnapshotLaunched = false;
 // 
 mainPort.onMessage.addListener(function (msg) {
  
-  let currentOnSnapshot;
-  currentCommentsList = [];
- 
-  if (!firstOnSnapshotLaunched) {
-    currentOnSnapshot = onSnapshot(collection(db, msg.title), (snapshot) => {
-      firstOnSnapshotLaunched = true;
-      if (!snapshot.empty) {
-        snapshot.forEach(doc => {
-          // console.log(doc.data())
-          currentCommentsList.push(doc);
-          getComments(currentCommentsList)
-        })
-      }
-    })
-    firstOnSnapshotLaunched = true;
-  }
-  messages = currentCommentsList;
-
   currentData.userIsLoggedIn = msg.userIsLoggedIn;
   currentData.podcastIsPlaying = msg.podcastIsPlaying;
   currentData.timecode.startingTime = msg.startingTime;
   currentData.timecode.endingTime = msg.endingTime;
   currentData.episode.title = msg.title;
   currentData.episode.rssUrl = msg.rssUrl;
+
+  let currentOnSnapshot;
+  currentCommentsList = [];
+ console.log(msg.title)
+  if (!firstOnSnapshotLaunched) {
+    currentOnSnapshot = onSnapshot(collection(db, msg.title), (snapshot) => {
+      firstOnSnapshotLaunched = true;
+      // console.log(currentOnSnapshot)
+      if (!snapshot.empty) {
+        snapshot.forEach(doc => {
+          // console.log(doc.data())
+          currentCommentsList.push(doc.data());
+          
+        })
+        console.log(currentCommentsList)
+       
+      }
+    })
+    firstOnSnapshotLaunched = true;
+  }
+  messages = currentCommentsList;
+  getComments(currentCommentsList)
+
+  
   currentEpisode = currentData.episode;
   
 
@@ -344,9 +350,9 @@ function switchPlayPauseButton () {
 function getComments(currentCommentt){
     while(1) {
       var preced;
-      currentCommentt.forEach(function(messages){
-        mess = messages.data()
-        console.log(mess.TimeCode)
+      currentCommentt.forEach(function(mess){
+        
+        console.log(mess)
       
       if(mess.TimeCode == currentData.timecode.startingTime){
 
