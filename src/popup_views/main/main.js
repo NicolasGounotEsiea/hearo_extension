@@ -9,7 +9,7 @@ import {
   collection,
   getDocs
 } from 'firebase/firestore'
-
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
 // ========== VARIABLES ========
 var timecode = 0;
 var userid;
@@ -38,22 +38,15 @@ let currentEpisodeTitle = "";
 let foregroundTabId = null;
 
 let commentObjectToSend = {
-  podcastEpisode: {},
-  timecode: '',
-  userName: '',
-  userId: '',
-  comment: '',
-  private: false 
+  podcast: '',
+  TimeCode: '',
+  UserName: '',
+  UUID: '',
+  Comment: '',
+  Private: 0
 }
 
-let commentToSend = {
-  podcastEpisode: {},
-  timecode: '',
-  userName: '',
-  userId: '',
-  comment: '',
-  private: false
-}
+
 
 let currentData = {
   userIsLoggedIn: false,
@@ -71,12 +64,20 @@ let currentData = {
 let ordersForFg = null;
 let currentOnSnapshot = null;
 
+onAuthStateChanged(getAuth(firebaseApp), user => {
+  if (user != null) {
+    currentUser = user
+    
+  } else {
+    currentUser = null
 
+  }
+})
 
 // ============ CODE ===========
 document.addEventListener('DOMContentLoaded', function () {
 
-  currentUser = getCurrentUser();
+
   checkUserLogin();
 
   chrome.storage.local.get(['foregroundTabId'], function (data) {
@@ -112,16 +113,16 @@ document.addEventListener('DOMContentLoaded', function () {
       textArea.placeholder = ' votre commentaire';
       textArea.style.setProperty('color', 'black');
       textArea.style.setProperty('background-color', 'white');
-
+      
       commentObjectToSend = {
-        podcastEpisode: currentData.episode,
-        timecode: currentData.timecode.startingTime,
-        userName: currentUser != null ? currentUser.displayName : '',
-        userId: currentUser != null ? currentUser.uid : '',
-        comment: userComment,
-        private: toggleStatus
+        podcast: Removeslash(currentData.episode.title) ,
+        TimeCode: currentData.timecode.startingTime,
+        UserName: currentUser != null ? currentUser.displayName : '',
+        UUID: currentUser != null ? currentUser.uid : '',
+        Comment: userComment,
+        Private:  toggleStatus ? 1:0
       }
-      commentObjectToSend.comment = cleanBadWords(commentObjectToSend.comment);
+      commentObjectToSend.Comment = cleanBadWords(commentObjectToSend.Comment);
 
       console.log('currentData.episode.title : ', currentData.episode.title);
       console.log('commentObjectToSend : ', commentObjectToSend);
@@ -147,7 +148,7 @@ mainPort.onMessage.addListener(function (msg) {
   updateLecture(msg.isPlaying);
   updateOnSnapshot();
 
-  console.log('currentCommentsList : ', currentCommentsList);
+  
 })
 
 // ==================================
@@ -159,29 +160,43 @@ function updateOnSnapshot() {
     
     resetOnSnapshot();
 
-    currentOnSnapshot = onSnapshot(collection(db, currentData.episode.title), (snapshot) => {
+    currentOnSnapshot = onSnapshot(collection(db, Removeslash(currentData.episode.title)  ), (snapshot) => {
       currentCommentsList = [];
       if (!snapshot.empty) {
         snapshot.forEach(doc => {
           currentCommentsList.push(doc.data());
         })
       }
+      console.log("-----------------------")
+      console.log(currentCommentsList)
+      console.log("-----------------------")
+      getComments();
     })
+
+    
     
   } else if (previousEpisodeTitle != currentEpisodeTitle && previousEpisodeTitle != "") {
     console.log('new episode');
     
     resetOnSnapshot();
 
-    currentOnSnapshot = onSnapshot(collection(db, currentData.episode.title), (snapshot) => {
+    currentOnSnapshot = onSnapshot(collection(db, Removeslash(currentData.episode.title)), (snapshot) => {
       currentCommentsList = [];
       if (!snapshot.empty) {
         snapshot.forEach(doc => {
           currentCommentsList.push(doc.data());
         })
+
+        
       }
+      console.log("-----------------------")
+      console.log(currentCommentsList)
+      console.log("-----------------------")
+      getComments();
     })
   }
+  
+  
 }
 
 function resetOnSnapshot() {
@@ -198,11 +213,6 @@ function checkUserLogin() {
   })
 }
 
-function getCurrentUser() {
-  chrome.storage.local.get(['currentUser'], function (data) {
-    return data.currentUser;
-  })
-}
 
 function response () {
   //surligne les réponses utilisateurs ("@...")
@@ -258,7 +268,7 @@ const updateStyleForEmptyComment = textArea => {
   textArea.style.setProperty('background-color', 'pink', 'important');
 }
 
-const cleanBadWords = comment => {
+function cleanBadWords (comment ) {
   var badWords = ['badword'];
   var sentence = comment;
   for (let i = 0; i < badWords.length; i++) {
@@ -268,9 +278,28 @@ const cleanBadWords = comment => {
   return sentence;
 }
 
+function Removeslash(title){
+  var slashes = ["/"];
+  var sentence = title;
+  for (let i = 0; i < slashes.length; i++) {
+    var regex = new RegExp(slashes[i], 'gi');
+    sentence = sentence.toString().replace(regex, '[xyyyzzeret]');
+  }
+  return sentence;
+}
+
+function Restoreslash(title){
+  var slashes = ['[xyyyzzeret]'];
+  for (let i = 0; i < slashes.length; i++) {
+    var regex = new RegExp(badWords[i], 'gi');
+    sentence = sentence.replace(regex, '/');
+  }
+  return sentence;
+}
+
 const addDocFirestore = async (collectionName, data) => {
   if (collectionName !== '' && data !== null) {
-    addDoc(collection(db, collectionName), data)
+    addDoc(collection(db, Removeslash(collectionName) ), data)
       .then(result => {
         console.log('Document written with ID: ', result.id);
       })
@@ -302,24 +331,42 @@ function switchPlayPauseButton () {
 }
 
 // fonction d'affichage des comentaires
-function getComments(currentCommentt){
-    while(1) {
+function getComments(){
+
+
+
+  
+    let loopid = setInterval(() => {
+
+      
+      if(currentData.timecode.startingTime != currentData.timecode.endingTime && currentData.podcastIsPlaying){
+    
       var preced;
-      currentCommentt.forEach(function(messages){
-        mess = messages.data()
-        console.log(mess.TimeCode)
+      currentCommentsList.forEach(mess => {
+
+      
+        
+        
+     
+         
+      
+        
+        
+      console.log(mess.TimeCode)
+      console.log(currentData.timecode.startingTime)
       
       if(mess.TimeCode == currentData.timecode.startingTime){
 
-        console.log(mess.TimeCode)
+       
 
       const messageElement = document.createElement('div');
       messageElement.id = numMess;
 
       var pri = 'Private';
-      // console.log(mess.UUID)
-      if (mess.UUID == userid) {
+    
+      if (mess.UUID == currentUser.uid) {
         numMess++;
+        console.log(mess.Private);
         if (mess.Private == 0) {
           pri = 'Public';
         }
@@ -373,9 +420,13 @@ function getComments(currentCommentt){
         messagesContainer.appendChild(messageElement);
         preced = messagesContainer;
       }
+      
+      
     }
 
-      messageElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    
+
+      // messageElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
 
       response();
 
@@ -388,7 +439,17 @@ function getComments(currentCommentt){
         myDiv.parentNode.removeChild(myDiv);
       }
     })
+  }else{
+    console.log("fin d'épisode")
   }
+    // if(currentData.timecode.startingTime == currentData.timecode.endingTime){
+    //   console.log("fin d'épisode")
+    //   // clearInterval(loopid)
+    // }
+    
+    
+  }, 1000);
+  
 }
 
 function testAff (mess) {
