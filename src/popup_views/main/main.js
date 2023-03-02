@@ -489,3 +489,8 @@ TODO : créer une fonction qui prends un commentaire en paramètre et qui l'affi
 TODO : créer une fonction qui prends une liste de commentaire en paramètre et qui les affiche dans le bonne ordre
 */
 
+
+//ATTENTION A APPELER CETTE FONCTION POUR CHAQUE ENTREEE D UTILISATEUR
+function escapeHtml(input) {
+  return input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;").replace(/\//g, "&#x2F;");
+}
