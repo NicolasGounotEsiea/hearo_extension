@@ -32,6 +32,8 @@ let mainIsActive = false
 let foregroundIsActive = false
 let currentUser = null
 
+let dataPlayerPort = null
+
 // ============ CODE ===========
 onAuthStateChanged(getAuth(firebaseApp), user => {
   if (user != null) {
@@ -62,10 +64,16 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         foregroundTabId = tabId
         chrome.storage.local.set({ 'foregroundTabId': foregroundTabId });
         chrome.storage.sync.set({ 'isForegroundInjected': true });
+        dataPlayerPort = chrome.tabs.connect(foregroundTabId, { name: 'data_player_btw_fg_and_bg' })
+
+        dataPlayerPort.onMessage.addListener(function (msg) {
+          console.log("msg received from foreground", msg)
+        })
       })
       .catch(err => console.log(err))
   }
 })
+
 
 chrome.runtime.onConnect.addListener(function (port) {
   if (port.name === 'data_player_fg_to_bg') {
@@ -82,8 +90,6 @@ chrome.runtime.onConnect.addListener(function (port) {
           title: msg.title,
           rssUrl: msg.rssUrl,
         })
-        // TODO : uncomment this line when the function sendCommentsToPopup() is done
-        // sendCommentsToPopup(commentsList)
       }
     })
 
@@ -115,109 +121,3 @@ function resetPort(port) {
     port = null
   }
 }
-
-// TODO : finir cette fonction
-function sortComments (comments) {
-  // ici on trie les commentaires par timecode, faut trouver la bonne logique
-  let commentsSorted = []
-  comments.forEach(item => {
-    console.log('item = ', item)
-    console.log('timecode = ', item.timecode)
-    commentsSorted.unshift(item)
-  })
-  return commentsSorted
-}
-
-// TODO : finir cette fonction
-function sendCommentsToPopup (commentsList) {
-  if (commentsPort !== null) {
-    let commentsToSend = sortComments(commentsList)
-
-    // ce qu'on envoie c'est un objet avec 3 éléments : commentsList, episodeTitle, rssUrl
-    // pour envoyer un objet, on utilise la méthode postMessage() avec le port commentsPort
-    if (allCommentsHasBeenSent) {
-      // envoyer à partir du timecode actuel + 10scd
-      // le timecode actuel est dans currentEpisode.startingTime
-      // voila commente faire le filtrage
-      commentsToSend = commentsToSend.filter(item => {
-        // return item.timecode > currentEpisode.startingTime + 10;
-      })
-    } else {
-      // envoyer tout commentsToSend parce que tous les commentaires n'ont pas encore été envoyés
-      allCommentsHasBeenSent = true
-    }
-  }
-}
-
-function updateEpisodeVariables (msgReceived) {
-  if (currentEpisode.title === '' && previousEpisode.title === '') {
-    currentEpisode.startingTime = msgReceived.startingTime
-    currentEpisode.endingTime = msgReceived.endingTime
-    currentEpisode.isPlaying = msgReceived.lecture
-    currentEpisode.title = msgReceived.title
-    currentEpisode.rssUrl = msgReceived.rssUrl
-
-    launchOnSnapshot()
-  } else if (
-    msgReceived.title !== currentEpisode.title &&
-    currentEpisode.title !== ''
-  ) {
-    previousEpisode.startingTime = currentEpisode.startingTime
-    previousEpisode.endingTime = currentEpisode.endingTime
-    previousEpisode.isPlaying = currentEpisode.lecture
-    previousEpisode.title = currentEpisode.title
-    previousEpisode.rssUrl = currentEpisode.rssUrl
-
-    currentEpisode.startingTime = msgReceived.startingTime
-    currentEpisode.endingTime = msgReceived.endingTime
-    currentEpisode.isPlaying = msgReceived.lecture
-    currentEpisode.title = msgReceived.title
-    currentEpisode.rssUrl = msgReceived.rssUrl
-
-    launchOnSnapshot()
-  } else if (currentEpisode.title === previousEpisode.title) {
-    currentEpisode.startingTime = msgReceived.startingTime
-    currentEpisode.endingTime = msgReceived.endingTime
-    currentEpisode.isPlaying = msgReceived.lecture
-  }
-}
-
-function launchOnSnapshot () {
-  if (currentEpisode.title !== '') {
-    let commentsList = []
-
-    if (currentOnSnapshot !== null) {
-      currentOnSnapshot()
-      currentOnSnapshot = null
-    }
-
-    // TODO : uncomment this code when firestore rules pblm fixed
-    // if (currentUser !== null) {
-    //   let collRef = collection(db, currentEpisode.title)
-    //   currentOnSnapshot = onSnapshot(collRef, (snapshot) => {
-    //     if (!snapshot.empty) {
-    //       snapshot.forEach(doc => {
-    //         commentsList.push(doc.data())
-    //       })
-    //       currentEpisode.comments = commentsList
-    //       console.log('Current comments list : ', currentEpisode.comments)
-    //     } else {
-    //       console.log('Collection empty for : ' + currentEpisode.title)
-    //     }
-    //   })
-    // }
-  }
-}
-
-// =========== IDEAS ===========
-/*
-TODO important : réussir à trier les commentaires par timecode avec le plus grand en premier
-TODO important : réussir à envoyer tous les commentaires apres le timecode actuel à la popup
-*/
-
-/*
-TODO pas important : Un fonction qui détecte s'il y a plusieurs onglets ouverts avec 
-le site podcasts.google.com pour envoyer un message à la popup et 
-qu'elle demande à l'utilisateur de fermer les autres onglets pour 
-une meilleure expérience utilisateur (éviter les conflits de données).
-*/

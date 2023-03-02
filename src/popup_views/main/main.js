@@ -31,8 +31,6 @@ let ordersForBg = chrome.runtime.connect({
 
 let currentUser = null;
 
-
-
 let previousEpisodeTitle = "";
 let currentEpisodeTitle = "";
 
@@ -70,6 +68,7 @@ let currentData = {
 }
 
 let ordersForFg = null;
+let currentOnSnapshot = null;
 
 
 
@@ -137,25 +136,6 @@ document.addEventListener('DOMContentLoaded', function () {
 let firstOnSnapshotLaunched = false;
 // 
 mainPort.onMessage.addListener(function (msg) {
- 
-  let currentOnSnapshot;
-  currentCommentsList = [];
- 
-  if (!firstOnSnapshotLaunched) {
-    currentOnSnapshot = onSnapshot(collection(db, msg.title), (snapshot) => {
-      firstOnSnapshotLaunched = true;
-      if (!snapshot.empty) {
-        snapshot.forEach(doc => {
-          // console.log(doc.data())
-          currentCommentsList.push(doc);
-          getComments(currentCommentsList)
-        })
-      }
-    })
-    firstOnSnapshotLaunched = true;
-  }
-  messages = currentCommentsList;
-
   currentData.userIsLoggedIn = msg.userIsLoggedIn;
   currentData.podcastIsPlaying = msg.podcastIsPlaying;
   currentData.timecode.startingTime = msg.startingTime;
@@ -163,53 +143,6 @@ mainPort.onMessage.addListener(function (msg) {
   currentData.episode.title = msg.title;
   currentData.episode.rssUrl = msg.rssUrl;
   currentEpisode = currentData.episode;
-  
-
-  if (currentEpisodeTitle !== msg.title) {
-    firstOnSnapshotLaunched = false;
-
-    currentOnSnapshot = onSnapshot(collection(db, currentEpisode.title), (snapshot) => {
-      console.log("onSnapshot launched");
-      if (!snapshot.empty) {
-        snapshot.forEach(doc => {
-          
-          currentCommentsList.push(doc.data());
-        })
-        currentData.comments = currentCommentsList;
-        console.log('Current comments list : ', currentEpisode.comments);
-      } else {
-        console.log('Collection empty for : ' + currentEpisode.title);
-      }
-    })
-  }
-    
-  
-
-
-  if (currentEpisode.title !== '') {
-    let commentsList = [];
-
-    if (currentOnSnapshot !== null) {
-      currentOnSnapshot()
-      currentOnSnapshot = null;
-    }
-
-    // TODO : uncomment this code when firestore rules pblm fixed
-    // if (currentUser !== null) {
-    //   currentOnSnapshot = onSnapshot(collection(db, currentEpisode.title), (snapshot) => {
-    //     console.log("onSnapshot launched")
-    //     if (!snapshot.empty) {
-    //       snapshot.forEach(doc => {
-    //         commentsList.push(doc.data())
-    //       })
-    //       currentEpisode.comments = commentsList
-    //       console.log('Current comments list : ', currentEpisode.comments)
-    //     } else {
-    //       console.log('Collection empty for : ' + currentEpisode.title)
-    //     }
-    //   })
-    // }
-  }
 
   updatePopupPlayer(msg.title, msg.startingTime, msg.endingTime);
   updateLecture(msg.isPlaying);
@@ -232,6 +165,24 @@ chrome.runtime.onConnect.addListener(function (port) {
 
 // ==================================
 // ============ FONCTIONS ===========
+
+function updateOnSnapshot() {
+  let commentsList = [];
+  currentOnSnapshot = onSnapshot(collection(db, currentData.episode.title), (snapshot) => {
+    if (!snapshot.empty) {
+      snapshot.forEach(doc => {
+        commentsList.push(doc.data());
+      })
+    }
+  })
+}
+
+function resetOnSnapshot() {
+  if (currentOnSnapshot != null) {
+    currentOnSnapshot();
+    currentOnSnapshot = null;
+  }
+}
 function checkUserLogin() {
   chrome.storage.sync.get(['userIsLogin'], function (data) {
     if (!data.userIsLogin) {
@@ -289,6 +240,9 @@ function updatePopupPlayer (episodeTitle, startingTime, endingTime) {
   let myTimecodeElement = document.getElementsByClassName('current_timecode')[0];
   myEpisodeTitleElement.innerHTML = episodeTitle;
   myTimecodeElement.innerHTML = startingTime + ' / ' + endingTime;
+
+  previousEpisodeTitle = currentEpisodeTitle;
+  currentEpisodeTitle = episodeTitle;
 }
 
 const updateStyleForEmptyComment = textArea => {

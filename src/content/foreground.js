@@ -6,13 +6,22 @@ import { firebaseApp, db } from '../firebase_config'
 // =============================
 // ========== VARIABLES ========
 let playerLoopSpeed = 1000
-let dataPlayerFgToBg = chrome.runtime.connect({
-  name: 'data_player_fg_to_bg'
-})
+// let dataPlayerFgToBg = chrome.runtime.connect({
+//   name: 'data_player_fg_to_bg'
+// })
+// console.log("background is disconnected.", dataPlayerFgToBg)
+let backgroundIsAlive = true
+
+let lePort = null
 
 // =============================
 // ============ CODE ===========
 if (document.readyState == 'complete') {
+
+  // dataPlayerFgToBg.onDisconnect.addListener(function () {
+  //   backgroundIsAlive = false
+  //   console.log("background is disconnected.")
+  // })
 
   if (document.querySelector("div[jsname='GnMNvf']") !== null) {
     chrome.storage.sync.set({ playerExist: true })
@@ -46,32 +55,48 @@ if (document.readyState == 'complete') {
       })
     }
   })
+
+  chrome.runtime.onConnect.addListener(function (port) {
+    if (port.name === 'data_player_btw_fg_and_bg') {
+      console.log("bg.js est actif.")
+      backgroundIsAlive = true
+      lePort = port
+  
+      port.onDisconnect.addListener(function () {
+        backgroundIsAlive = false
+        console.log("bg.js n'est plus actif.")
+      })
+    }
+  })
 }
 
 // =============================
 // ========= FUNCTIONS =========
 function sendDataPlayer () {
   let playerExist = document.querySelector("div[jsname='GnMNvf']") !== null
-  dataPlayerFgToBg.postMessage({
-    startingTime: playerExist
-      ? document.getElementsByClassName('oG0wpe')[0].firstChild.textContent
-      : '',
-    endingTime: playerExist
-      ? document.getElementsByClassName('oG0wpe')[0].lastChild.textContent
-      : '',
-    lecture: playerExist
-      ? document.querySelector("div[jsname='IGlMSc']").ariaLabel
-      : '',
-    title: playerExist
-      ? document.querySelector("div[jsname='jLuDgc']").textContent
-      : '',
-    rssUrl: playerExist
-      ? document.querySelector("div[jsname='NTHlvd']").textContent
-      : '',
-    playerIsLoad: playerExist ? true : false
-  })
-
+  
   if (!playerExist) {
     chrome.storage.sync.set({ playerExist: false })
+  }
+
+  if (lePort !== null && playerExist && backgroundIsAlive) {
+    lePort.postMessage({
+      startingTime: playerExist
+        ? document.getElementsByClassName('oG0wpe')[0].firstChild.textContent
+        : '',
+      endingTime: playerExist
+        ? document.getElementsByClassName('oG0wpe')[0].lastChild.textContent
+        : '',
+      lecture: playerExist
+        ? document.querySelector("div[jsname='IGlMSc']").ariaLabel
+        : '',
+      title: playerExist
+        ? document.querySelector("div[jsname='jLuDgc']").textContent
+        : '',
+      rssUrl: playerExist
+        ? document.querySelector("div[jsname='NTHlvd']").textContent
+        : '',
+      playerIsLoad: playerExist ? true : false
+    })
   }
 }
