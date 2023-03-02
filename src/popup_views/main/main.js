@@ -63,7 +63,9 @@ let currentData = {
 
 let ordersForFg = null;
 let currentOnSnapshot = null;
-
+// document.oncontextmenu = function() {
+//   return false;
+// }
 onAuthStateChanged(getAuth(firebaseApp), user => {
   if (user != null) {
     currentUser = user
@@ -106,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   document.querySelector('#publish_btn').addEventListener('click', () => {
     let textArea = document.getElementById('text_field');
-    let userComment = textArea.value;
+    let userComment = escapeHtml(textArea.value);
     let toggleStatus = document.getElementById('togBtn').checked;
 
     if (userComment.length !== 0) {
@@ -340,7 +342,7 @@ function getComments(){
 
       
       if(currentData.timecode.startingTime != currentData.timecode.endingTime && currentData.podcastIsPlaying){
-    
+        setTimeout(1400);
       var preced;
       currentCommentsList.forEach(mess => {
 
@@ -430,14 +432,14 @@ function getComments(){
 
       response();
 
-      if (numMess > limite) {
-        //limiter le nombre de messages dans le chat
-        const messagesToDelete = numMess - limite - 1;
+      // if (numMess > limite) {
+      //   //limiter le nombre de messages dans le chat
+      //   const messagesToDelete = numMess - limite - 1;
 
-        let myDiv = document.getElementById(messagesToDelete);
-        // console.log(myDiv)
-        myDiv.parentNode.removeChild(myDiv);
-      }
+      //   let myDiv = document.getElementById(messagesToDelete);
+      //   // console.log(myDiv)
+      //   myDiv.parentNode.removeChild(myDiv);
+      // }
     })
   }else{
     console.log("fin d'épisode")
@@ -448,7 +450,7 @@ function getComments(){
     // }
     
     
-  }, 1000);
+  }, 1200);
   
 }
 
@@ -504,4 +506,9 @@ function testAff (mess) {
 TODO : créer une fonction qui prends un commentaire en paramètre et qui l'affiche
 TODO : créer une fonction qui prends une liste de commentaire en paramètre et qui les affiche dans le bonne ordre
 */
+
+//ATTENTION A APPELER CETTE FONCTION POUR CHAQUE ENTREEE D UTILISATEUR
+function escapeHtml(input) {
+  return input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;").replace(/\//g, "&#x2F;");
+}
 

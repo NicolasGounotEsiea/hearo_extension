@@ -110,6 +110,7 @@ body {
 /* WRITE COMMENT */
 /* WRITE COMMENT */
 .write-comment {
+  margin-top: 10px;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;

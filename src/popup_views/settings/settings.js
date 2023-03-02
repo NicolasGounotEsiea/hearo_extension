@@ -8,7 +8,9 @@ import { firebaseApp } from '../../firebase_config'
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 const auth = getAuth(firebaseApp); // Auth instance for the current firebaseApp
-
+// document.oncontextmenu = function() {
+//   return false;
+// }
 onAuthStateChanged(auth, user => {
   if (user != null) {
     console.log('Logged in and current user is : ', user);

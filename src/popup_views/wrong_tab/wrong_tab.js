@@ -3,7 +3,9 @@
 console.log("------------ WRONG_TAB.JS IS LOADED ------------");
 // *************************************************************
 // *************************************************************
-
+// document.oncontextmenu = function() {
+//   return false;
+// }
 document.querySelector('#open-google-podcast').addEventListener('click', function() {
   chrome.tabs.create({url: "https://podcasts.google.com/"});
 });

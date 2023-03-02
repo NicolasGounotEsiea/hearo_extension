@@ -9,7 +9,9 @@ import {
   setPersistence,
   browserLocalPersistence
 } from 'firebase/auth'
-
+// document.oncontextmenu = function() {
+//   return false;
+// }
 const auth = getAuth(firebaseApp) // Auth instance for the current firebaseApp
 setPersistence(auth, browserLocalPersistence) // To keep user signin localy
 
