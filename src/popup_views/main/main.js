@@ -134,6 +134,7 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
       updateStyleForEmptyComment(textArea);
     }
+    testAff (commentObjectToSend)
   })
 })
 
@@ -342,7 +343,7 @@ function getComments(){
 
       
       if(currentData.timecode.startingTime != currentData.timecode.endingTime && currentData.podcastIsPlaying){
-        setTimeout(1400);
+        // setTimeout(1400);
       var preced;
       currentCommentsList.forEach(mess => {
 
@@ -353,9 +354,7 @@ function getComments(){
          
       
         
-        
-      console.log(mess.TimeCode)
-      console.log(currentData.timecode.startingTime)
+    
       
       if(mess.TimeCode == currentData.timecode.startingTime){
 
@@ -450,14 +449,14 @@ function getComments(){
     // }
     
     
-  }, 1200);
+  }, 1400);
   
 }
 
 function testAff (mess) {
   //juste une fonction d'injection de commentaire qu'il faut que je renomme
 
-  messageElement = document.createElement('div');
+  let messageElement = document.createElement('div');
 
   var pri = 'Private';
   if (mess.private == 0) {
@@ -467,8 +466,8 @@ function testAff (mess) {
   
   <div class="chat-message-content">
   
-    <p class="chat-message-username">  <span class="pubpri">${pri}</span><span class="time">${mess.timeCode}</span>${mess.userName}</p>
-    <p class="chat-message-text">${mess.comment}</p>
+    <p class="chat-message-username">  <span class="pubpri">${pri}</span><span class="time">${mess.TimeCode}</span>${mess.UserName}</p>
+    <p class="chat-message-text">${mess.Comment}</p>
     <div class="container-mod">
   <div class="item">
    
@@ -487,16 +486,16 @@ function testAff (mess) {
   numMess++;
   const messagesContainer = document.querySelector('#messages');
   messagesContainer.appendChild(messageElement);
-  preced = messagesContainer;
+  // preced = messagesContainer;
 
-  if (numMess > limite) {
-    //limiter le nombre de messages dans le chat
-    const messagesToDelete = numMess - limite - 1;
+  // if (numMess > limite) {
+  //   //limiter le nombre de messages dans le chat
+  //   const messagesToDelete = numMess - limite - 1;
 
-    let myDiv = document.getElementById(messagesToDelete);
-    // console.log(myDiv)
-    myDiv.parentNode.removeChild(myDiv);
-  }
+  //   let myDiv = document.getElementById(messagesToDelete);
+  //   // console.log(myDiv)
+  //   myDiv.parentNode.removeChild(myDiv);
+  // }
 
   response();
 }
@@ -511,4 +510,5 @@ TODO : créer une fonction qui prends une liste de commentaire en paramètre et 
 function escapeHtml(input) {
   return input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;").replace(/\//g, "&#x2F;");
 }
+
 
