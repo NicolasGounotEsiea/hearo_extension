@@ -14,13 +14,14 @@ import {
 var timecode = 0;
 var userid;
 let comment = '';
-let currentCommentsList;
+// let currentCommentsList;
 let messages;
 let limite = 10 ;//limite de message du chat
 let numMess = 0 ;//nombre de messages affichés depuis le début
 // let messageElement = ''; //élément injecter pour afficher le commentaire
 let preced = ''; //div du message precedent
 
+let currentCommentsList = [];
 
 let mainPort = chrome.runtime.connect({ name: 'main_status' });
 var currentEpisode;
@@ -133,8 +134,6 @@ document.addEventListener('DOMContentLoaded', function () {
   })
 })
 
-let firstOnSnapshotLaunched = false;
-// 
 mainPort.onMessage.addListener(function (msg) {
   currentData.userIsLoggedIn = msg.userIsLoggedIn;
   currentData.podcastIsPlaying = msg.podcastIsPlaying;
@@ -146,35 +145,43 @@ mainPort.onMessage.addListener(function (msg) {
 
   updatePopupPlayer(msg.title, msg.startingTime, msg.endingTime);
   updateLecture(msg.isPlaying);
-})
+  updateOnSnapshot();
 
-chrome.runtime.onConnect.addListener(function (port) {
-  if (port.name === 'comments_from_bg') {
-    port.onMessage.addListener(function (msg) {
-      console.log('main.js - Message received from ' + port.name + ' : ', msg);
-      previousCommentsList = currentCommentsList;
-      // currentCommentsList = msg.comments;
-      // TODO : Mettre à jour la popup avec une fonction qui va afficher les nouveaux commentaires
-    })
-
-    port.onDisconnect.addListener(function () {
-      console.log("main.js - background.js n'est plus actif.");
-    })
-  }
+  console.log('currentCommentsList : ', currentCommentsList);
 })
 
 // ==================================
 // ============ FONCTIONS ===========
 
 function updateOnSnapshot() {
-  let commentsList = [];
-  currentOnSnapshot = onSnapshot(collection(db, currentData.episode.title), (snapshot) => {
-    if (!snapshot.empty) {
-      snapshot.forEach(doc => {
-        commentsList.push(doc.data());
-      })
-    }
-  })
+  if (previousEpisodeTitle === "" && currentEpisodeTitle != "") {
+    console.log('first episode');
+    
+    resetOnSnapshot();
+
+    currentOnSnapshot = onSnapshot(collection(db, currentData.episode.title), (snapshot) => {
+      currentCommentsList = [];
+      if (!snapshot.empty) {
+        snapshot.forEach(doc => {
+          currentCommentsList.push(doc.data());
+        })
+      }
+    })
+    
+  } else if (previousEpisodeTitle != currentEpisodeTitle && previousEpisodeTitle != "") {
+    console.log('new episode');
+    
+    resetOnSnapshot();
+
+    currentOnSnapshot = onSnapshot(collection(db, currentData.episode.title), (snapshot) => {
+      currentCommentsList = [];
+      if (!snapshot.empty) {
+        snapshot.forEach(doc => {
+          currentCommentsList.push(doc.data());
+        })
+      }
+    })
+  }
 }
 
 function resetOnSnapshot() {

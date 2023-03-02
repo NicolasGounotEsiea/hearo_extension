@@ -67,35 +67,18 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         dataPlayerPort = chrome.tabs.connect(foregroundTabId, { name: 'data_player_btw_fg_and_bg' })
 
         dataPlayerPort.onMessage.addListener(function (msg) {
-          console.log("msg received from foreground", msg)
+          if (mainIsActive && mainPort !== null) {
+            mainPort.postMessage({
+              startingTime: msg.startingTime,
+              endingTime: msg.endingTime,
+              isPlaying: msg.lecture,
+              title: msg.title,
+              rssUrl: msg.rssUrl,
+            })
+          }
         })
       })
       .catch(err => console.log(err))
-  }
-})
-
-
-chrome.runtime.onConnect.addListener(function (port) {
-  if (port.name === 'data_player_fg_to_bg') {
-    foregroundIsActive = true
-    
-    port.onMessage.addListener(function (msg) {
-      updateEpisodeVariables(msg)
-      
-      if (mainIsActive && mainPort !== null) {
-        mainPort.postMessage({
-          startingTime: msg.startingTime,
-          endingTime: msg.endingTime,
-          isPlaying: msg.lecture,
-          title: msg.title,
-          rssUrl: msg.rssUrl,
-        })
-      }
-    })
-
-    port.onDisconnect.addListener(function () {
-      foregroundIsActive = false
-    })
   }
 })
 
