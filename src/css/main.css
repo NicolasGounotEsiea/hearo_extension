@@ -367,6 +367,7 @@ body {
 
 .chat-message-content {
   flex-grow: 1;
+  position: relative;
 }
 
 .chat-message-username {
@@ -387,6 +388,27 @@ body {
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;
+}
+
+.delete-message-button{
+  width: 15px;
+  height: 15px;
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  margin-right: 5px;
+  background-image: url(../icons/icons8-supprimer-pour-toujours-48.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  cursor: pointer;
+}
+
+.delete-message-button:hover{
+  transform: scale(1.2);
+}
+
+.delete-message-button:active {
+  transform: scale(0.8);
 }
 
 .user-message .chat-message-content {
@@ -425,6 +447,12 @@ body {
 
 .private {
   margin-left: 200px;
+}
+
+.delete-message-button {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css');

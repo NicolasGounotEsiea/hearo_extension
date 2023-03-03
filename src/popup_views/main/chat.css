@@ -11,6 +11,7 @@
   
   .chat-message-content {
     flex-grow: 1;
+    position: relative;
   }
   
   .chat-message-username {
@@ -22,3 +23,8 @@
     color: #333;
   }
 
+  .delete-message-button {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }

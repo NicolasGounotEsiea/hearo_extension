@@ -3,11 +3,13 @@ console.log('MAIN ready !')
 // =========== IMPORTS =========
 import { db, firebaseApp } from '../../firebase_config'
 import {
+  doc,
   getFirestore,
   onSnapshot,
   addDoc,
   collection,
-  getDocs
+  getDocs,
+  deleteDoc
 } from 'firebase/firestore'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 // ========== VARIABLES ========
@@ -15,7 +17,7 @@ var timecode = 0;
 var userid;
 let comment = '';
 // let currentCommentsList;
-const MAX_SIZE = 5;
+const MAX_SIZE = 12;
 let precedentCommentaire = new Array(MAX_SIZE);
 let tetePreced = 0;
 let messages;
@@ -132,8 +134,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
       console.log('currentData.episode.title : ', currentData.episode.title);
       console.log('commentObjectToSend : ', commentObjectToSend);
-      addDocFirestore(currentData.episode.title, commentObjectToSend);
-      testAff (commentObjectToSend)
+      addDocFirestore(currentData.episode.title, commentObjectToSend)
+       
+
+      
+      
 
       textArea.value = ''
     } else {
@@ -196,7 +201,7 @@ function updateOnSnapshot() {
       currentCommentsList = [];
       if (!snapshot.empty) {
         snapshot.forEach(doc => {
-          currentCommentsList.push(doc.data());
+          currentCommentsList.push(doc);
         })
       }
       console.log("-----------------------")
@@ -216,7 +221,7 @@ function updateOnSnapshot() {
       currentCommentsList = [];
       if (!snapshot.empty) {
         snapshot.forEach(doc => {
-          currentCommentsList.push(doc.data());
+          currentCommentsList.push(doc);
         })
 
         
@@ -334,6 +339,9 @@ const addDocFirestore = async (collectionName, data) => {
     addDoc(collection(db, Removeslash(collectionName) ), data)
       .then(result => {
         console.log('Document written with ID: ', result.id);
+        let iddoc = result.id;
+        testAff (commentObjectToSend, iddoc)
+        ajouterElement(commentObjectToSend)
       })
       .catch(err => {
         console.error('Error adding document: ', err);
@@ -374,9 +382,9 @@ function getComments(){
       if(currentData.timecode.startingTime != currentData.timecode.endingTime && currentData.podcastIsPlaying){
         // setTimeout(1400);
       var preced;
-      currentCommentsList.forEach(mess => {
+      currentCommentsList.forEach(messages => {
 
-      
+      let mess = messages.data();
       if(mess.TimeCode == currentData.timecode.startingTime && !contientElement(mess)){
 
        ajouterElement(mess);
@@ -385,6 +393,7 @@ function getComments(){
 
       const messageElement = document.createElement('div');
       messageElement.id = numMess;
+      console.log(messages.id)
 
       var pri = 'Private';
     
@@ -394,24 +403,13 @@ function getComments(){
         if (mess.Private == 0) {
           pri = 'Public';
         }
-        messageElement.innerHTML = `<div class="chat-message user-message">
+        messageElement.innerHTML = `<div class="chat-message user-message" data-id="${messages.id}">
             <div class="chat-message-content">
-            
+            <button class="delete-message-button" data-id="${messages.id}">
+    </button>
               <p class="chat-message-username"> <span class="pubpri">${pri}</span><span class="time">${mess.TimeCode}</span>${mess.UserName}</p>
               <p class="chat-message-text">${mess.Comment}</p>
-              <div class="container-mod">
-  <div class="item">
-   
-    <div class="options-container">
-        <button class="options-button"><i class="fas fa-ellipsis-v"></i>...</button>
-        <div class="options">
-            <button class="edit">  <i class="fas fa-edit"></i> Modifier</button>
-            <button class="delete">  <i class="fas fa-trash"></i> Supprimer</button>
-        </div>
-    </div>
-  </div>
-</div>
-            </div>
+              
           </div>
           
           `;
@@ -425,17 +423,7 @@ function getComments(){
             
               <p class="chat-message-username">${mess.UserName}  <span class="time">${mess.TimeCode}</span> </p>
               <p class="chat-message-text">${mess.Comment}</p>
-              <div class="container-mod">
-              <div class="item">
-               
-                <div class="options-container">
-                    <button class="options-button"><i class="fas fa-ellipsis-v"></i>...</button>
-                    <div class="options">
-                        <button class="edit">  <i class="fas fa-edit"></i> Modifier</button>
-                        <button class="delete">  <i class="fas fa-trash"></i> Supprimer</button>
-                    </div>
-                </div>
-              </div>
+              
             </div>
             </div>
           </div>
@@ -476,7 +464,7 @@ function getComments(){
   
 }
 
-function testAff (mess) {
+function testAff (mess, iddoc) {
   //juste une fonction d'injection de commentaire qu'il faut que je renomme
 
   let messageElement = document.createElement('div');
@@ -485,27 +473,16 @@ function testAff (mess) {
   if (mess.private == 0) {
     pri = 'Public';
   }
-  messageElement.innerHTML = `<div class="chat-message user-message">
-  
+  messageElement.innerHTML = `<div class="chat-message user-message" data-id="${iddoc}">
   <div class="chat-message-content">
-  
-    <p class="chat-message-username">  <span class="pubpri">${pri}</span><span class="time">${mess.TimeCode}</span>${mess.UserName}</p>
+  <button class="delete-message-button" data-id="${iddoc}">
+</button>
+    <p class="chat-message-username"> <span class="pubpri">${pri}</span><span class="time">${mess.TimeCode}</span>${mess.UserName}</p>
     <p class="chat-message-text">${mess.Comment}</p>
-    <div class="container-mod">
-  <div class="item">
-   
-    <div class="options-container">
-        <button class="options-button"><i class="fas fa-ellipsis-v"></i>...</button>
-        <div class="options">
-            <button class="edit">  <i class="fas fa-edit"></i> Modifier</button>
-            <button class="delete">  <i class="fas fa-trash"></i> Supprimer</button>
-        </div>
-    </div>
-  </div>
+    
 </div>
-  </div>
-  </div>
-  `;
+
+`;
   numMess++;
   const messagesContainer = document.querySelector('#messages');
   messagesContainer.appendChild(messageElement);
@@ -548,3 +525,27 @@ function contientElement(mess) {
   }
   return false;
 }
+
+// const messagesContainer = document.querySelector('#messages');
+// messagesContainer.addEventListener('click', event => {
+//   db.collection(currentData.episode.title).doc(data-id).delete().then(() => {
+//     console.log("Document supprimé avec succès !");
+//   }).catch((error) => {
+//     console.error("Erreur lors de la suppression du document :", error);
+//   });
+// });
+const messagesContainer = document.querySelector('#messages');
+ messagesContainer.addEventListener('click', (event) => {
+  if (event.target.classList.contains('delete-message-button')) {
+  const messageId = event.target.dataset.id;
+  deleteDoc(doc(db, Removeslash(currentData.episode.title), messageId)).then(() => {
+
+    const elementToRemove = document.querySelector(`[data-id="${messageId}"]`);
+    elementToRemove.remove();
+
+    console.log("Document supprimé avec succès !");
+  }).catch((error) => {
+    console.error("Erreur lors de la suppression du document :", error);
+  });
+}
+})
