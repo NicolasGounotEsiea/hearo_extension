@@ -133,13 +133,13 @@ document.addEventListener('DOMContentLoaded', function () {
       console.log('currentData.episode.title : ', currentData.episode.title);
       console.log('commentObjectToSend : ', commentObjectToSend);
       addDocFirestore(currentData.episode.title, commentObjectToSend);
+      testAff (commentObjectToSend)
 
       textArea.value = ''
     } else {
       updateStyleForEmptyComment(textArea);
     }
    
-    testAff (commentObjectToSend)
   })
 })
 
