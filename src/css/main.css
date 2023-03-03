@@ -335,7 +335,22 @@ body {
 
 
 
+#messages::-webkit-scrollbar {
+  width: 8px;
+  background-color: transparent;
+}
 
+/* Cible la poignée de défilement */
+#messages::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #e1eefc;
+  margin-right: -5px;
+}
+
+/* Effet de hover sur la poignée de défilement */
+#messages::-webkit-scrollbar-thumb:hover {
+  background-color: #555555;
+}
 
 
 

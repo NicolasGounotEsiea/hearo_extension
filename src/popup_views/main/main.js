@@ -15,6 +15,9 @@ var timecode = 0;
 var userid;
 let comment = '';
 // let currentCommentsList;
+const MAX_SIZE = 5;
+let precedentCommentaire = new Array(MAX_SIZE);
+let tetePreced = 0;
 let messages;
 let limite = 10 ;//limite de message du chat
 let numMess = 0 ;//nombre de messages affichés depuis le début
@@ -125,6 +128,7 @@ document.addEventListener('DOMContentLoaded', function () {
         Private:  toggleStatus ? 1:0
       }
       commentObjectToSend.Comment = cleanBadWords(commentObjectToSend.Comment);
+      ajouterElement(commentObjectToSend)
 
       console.log('currentData.episode.title : ', currentData.episode.title);
       console.log('commentObjectToSend : ', commentObjectToSend);
@@ -134,6 +138,7 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
       updateStyleForEmptyComment(textArea);
     }
+   
     testAff (commentObjectToSend)
   })
 })
@@ -156,6 +161,30 @@ mainPort.onMessage.addListener(function (msg) {
 
 // ==================================
 // ============ FONCTIONS ===========
+
+
+// Récupération de la div qui contient les messages
+var div = document.getElementById('messages');
+
+// Fonction pour positionner la poignée de défilement en bas
+function scrollToBottom() {
+  div.scrollTop = div.scrollHeight;
+}
+
+// Configuration de l'observer
+var observerConfig = { childList: true, subtree: true };
+
+// Création de l'observer
+var observer = new MutationObserver(function() {
+  // Positionne la poignée de défilement en bas
+  scrollToBottom();
+});
+
+// Démarrage de l'observer
+observer.observe(div, observerConfig);
+
+// Positionne la poignée de défilement en bas au chargement de la page
+scrollToBottom();
 
 function updateOnSnapshot() {
   if (previousEpisodeTitle === "" && currentEpisodeTitle != "") {
@@ -337,7 +366,7 @@ function switchPlayPauseButton () {
 function getComments(){
 
 
-
+    
   
     let loopid = setInterval(() => {
 
@@ -348,15 +377,9 @@ function getComments(){
       currentCommentsList.forEach(mess => {
 
       
-        
-        
-     
-         
-      
-        
-    
-      
-      if(mess.TimeCode == currentData.timecode.startingTime){
+      if(mess.TimeCode == currentData.timecode.startingTime && !contientElement(mess)){
+
+       ajouterElement(mess);
 
        
 
@@ -512,3 +535,16 @@ function escapeHtml(input) {
 }
 
 
+function ajouterElement(element) {
+  precedentCommentaire[tetePreced] = element;
+  tetePreced = (tetePreced + 1) % MAX_SIZE;
+}
+
+function contientElement(mess) {
+  for (let i = 0; i < MAX_SIZE; i++) {
+    if (precedentCommentaire[i] === mess) {
+      return true;
+    }
+  }
+  return false;
+}
