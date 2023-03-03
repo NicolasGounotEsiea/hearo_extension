@@ -48,7 +48,53 @@ onAuthStateChanged(getAuth(firebaseApp), user => {
   }
 })
 
-// TODO : lancer wrong_tab.html si l'utilisateur n'a pas d'onglet google podcast
+
+chrome.tabs.query({}, function (tabs) {
+  console.log('tabs : ', tabs)
+  let weHaveGooglePodcastTab = false
+  tabs.forEach(tab => {
+    if (tab.url.includes('podcasts.google.com')) {
+      weHaveGooglePodcastTab = true
+    }
+  })
+  if (!weHaveGooglePodcastTab) {
+    console.log('We dont have google podcast tab')
+    chrome.action.setPopup({popup: "wrong_tab.html"});
+  }
+})
+
+chrome.tabs.onCreated.addListener(function(tab) {
+  console.log("Nouvel onglet créé: " + tab.url);
+  chrome.tabs.query({}, function (tabs) {
+    console.log('tabs : ', tabs)
+    let weHaveGooglePodcastTab = false
+    tabs.forEach(tab => {
+      if (tab.url.includes('podcasts.google.com')) {
+        weHaveGooglePodcastTab = true
+      }
+    })
+    if (!weHaveGooglePodcastTab) {
+      console.log('We dont have google podcast tab')
+      chrome.action.setPopup({popup: "wrong_tab.html"});
+    }
+  })
+});
+chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
+  console.log("Onglet fermé: " + tabId);
+  chrome.tabs.query({}, function (tabs) {
+    console.log('tabs : ', tabs)
+    let weHaveGooglePodcastTab = false
+    tabs.forEach(tab => {
+      if (tab.url.includes('podcasts.google.com')) {
+        weHaveGooglePodcastTab = true
+      }
+    })
+    if (!weHaveGooglePodcastTab) {
+      console.log('We dont have google podcast tab')
+      chrome.action.setPopup({popup: "wrong_tab.html"});
+    }
+  })
+});
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (
