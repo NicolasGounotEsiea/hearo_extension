@@ -305,7 +305,7 @@ body {
   line-height: 12px;
   color: #FFFFFF;
   white-space: nowrap;
-  animation: myAnim 10s linear 1s infinite alternate none;
+  /* animation: myAnim 10s linear 1s infinite alternate none; */
   /* border: 2px solid red; */
 }
 .current_timecode {
@@ -351,8 +351,6 @@ body {
 #messages::-webkit-scrollbar-thumb:hover {
   background-color: #555555;
 }
-
-
 
 .highlight {
   background-color: yellow;
