@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', function () {
         Private:  toggleStatus ? 1:0
       }
       commentObjectToSend.Comment = cleanBadWords(commentObjectToSend.Comment);
-      ajouterElement(commentObjectToSend)
+      // ajouterElement(commentObjectToSend)
 
       console.log('currentData.episode.title : ', currentData.episode.title);
       console.log('commentObjectToSend : ', commentObjectToSend);
@@ -342,7 +342,7 @@ const addDocFirestore = async (collectionName, data) => {
         console.log('Document written with ID: ', result.id);
         let iddoc = result.id;
         testAff (commentObjectToSend, iddoc)
-        ajouterElement(commentObjectToSend)
+        ajouterElement(result.id)
       })
       .catch(err => {
         console.error('Error adding document: ', err);
@@ -386,9 +386,9 @@ function getComments(){
       currentCommentsList.forEach(messages => {
 
       let mess = messages.data();
-      if(mess.TimeCode == currentData.timecode.startingTime && !contientElement(mess)){
+      if(mess.TimeCode == currentData.timecode.startingTime && !contientElement(messages.id)){
 
-       ajouterElement(mess);
+       ajouterElement(messages.id);
 
        
 
@@ -478,14 +478,14 @@ function testAff (mess, iddoc) {
   if (mess.private == 0) {
     pri = 'Public';
   }
-  messageElement.innerHTML = `<div class="chat-message user-message" data-id="${messages.id}">
+  messageElement.innerHTML = `<div class="chat-message user-message" data-id="${iddoc}">
   <div class="chat-message-content">
   <div class="message-buttons">
-  <button class="delete-message-button" data-id="${messages.id}"></button>
-  <button class="edit-message-button" data-id="${messages.id}"></button>
+  <button class="delete-message-button" data-id="${iddoc}"></button>
+  <button class="edit-message-button" data-id="${iddoc}"></button>
 </div>
     <p class="chat-message-username"> <span class="pubpri">${pri}</span><span class="time">${mess.TimeCode}</span>${mess.UserName}</p>
-    <p class="chat-message-text" data-id="${messages.id}">${mess.Comment}</p>
+    <p class="chat-message-text" data-id="${iddoc}">${mess.Comment}</p>
     
 
 </div>
@@ -582,10 +582,11 @@ messagesContainer.addEventListener('click', (event) => {
     button.addEventListener('click', () => {
       const newMessageText = input.value;
 
-      const washingtonRef = doc(db, Removeslash(currentData.episode.title),  messageId);
-      updateDoc(washingtonRef, {
+      const modifcom = doc(db, Removeslash(currentData.episode.title),  messageId);
+      updateDoc(modifcom, {
         Comment: newMessageText
-      }).then(() => {
+      }).then((result) => {
+        
         const newText = input.value;
         const newChatMessageText = document.createElement('p');
         newChatMessageText.classList.add('chat-message-text');
