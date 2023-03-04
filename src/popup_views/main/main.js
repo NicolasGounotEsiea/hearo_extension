@@ -9,7 +9,8 @@ import {
   addDoc,
   collection,
   getDocs,
-  deleteDoc
+  deleteDoc,
+  updateDoc 
 } from 'firebase/firestore'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 // ========== VARIABLES ========
@@ -405,11 +406,15 @@ function getComments(){
         }
         messageElement.innerHTML = `<div class="chat-message user-message" data-id="${messages.id}">
             <div class="chat-message-content">
-            <button class="delete-message-button" data-id="${messages.id}">
-    </button>
+            <div class="message-buttons">
+            <button class="delete-message-button" data-id="${messages.id}"></button>
+            <button class="edit-message-button" data-id="${messages.id}"></button>
+    </div>
               <p class="chat-message-username"> <span class="pubpri">${pri}</span><span class="time">${mess.TimeCode}</span>${mess.UserName}</p>
-              <p class="chat-message-text">${mess.Comment}</p>
+              <p class="chat-message-text  data-id="${messages.id}">${mess.Comment}</p>
               
+          
+          </div>
           </div>
           
           `;
@@ -473,13 +478,17 @@ function testAff (mess, iddoc) {
   if (mess.private == 0) {
     pri = 'Public';
   }
-  messageElement.innerHTML = `<div class="chat-message user-message" data-id="${iddoc}">
+  messageElement.innerHTML = `<div class="chat-message user-message" data-id="${messages.id}">
   <div class="chat-message-content">
-  <button class="delete-message-button" data-id="${iddoc}">
-</button>
+  <div class="message-buttons">
+  <button class="delete-message-button" data-id="${messages.id}"></button>
+  <button class="edit-message-button" data-id="${messages.id}"></button>
+</div>
     <p class="chat-message-username"> <span class="pubpri">${pri}</span><span class="time">${mess.TimeCode}</span>${mess.UserName}</p>
-    <p class="chat-message-text">${mess.Comment}</p>
+    <p class="chat-message-text" data-id="${messages.id}">${mess.Comment}</p>
     
+
+</div>
 </div>
 
 `;
@@ -535,7 +544,7 @@ function contientElement(mess) {
 //   });
 // });
 const messagesContainer = document.querySelector('#messages');
- messagesContainer.addEventListener('click', (event) => {
+messagesContainer.addEventListener('click', (event) => {
   if (event.target.classList.contains('delete-message-button')) {
   const messageId = event.target.dataset.id;
   deleteDoc(doc(db, Removeslash(currentData.episode.title), messageId)).then(() => {
@@ -547,5 +556,47 @@ const messagesContainer = document.querySelector('#messages');
   }).catch((error) => {
     console.error("Erreur lors de la suppression du document :", error);
   });
-}
+  }
+  if (event.target.classList.contains('edit-message-button')) {
+    const messageId = event.target.dataset.id;
+    console.log("messageId:", messageId);
+    const chatMessage = document.querySelector(`[data-id="${messageId}"]`);
+    const chatMessageText = chatMessage.querySelector('.chat-message-text');
+
+    console.log("chatMessageText:", chatMessageText);
+    const inputContainer = document.createElement('div');
+    inputContainer.classList.add('input-container');
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = chatMessageText.textContent;
+
+    const button = document.createElement('button');
+    button.classList.add('validate-edit');
+    
+
+    inputContainer.append(input, button);
+
+    chatMessageText.replaceWith(inputContainer);
+
+    button.addEventListener('click', () => {
+      const newMessageText = input.value;
+
+      const washingtonRef = doc(db, Removeslash(currentData.episode.title),  messageId);
+      updateDoc(washingtonRef, {
+        Comment: newMessageText
+      }).then(() => {
+        const newText = input.value;
+        const newChatMessageText = document.createElement('p');
+        newChatMessageText.classList.add('chat-message-text');
+        newChatMessageText.textContent = newText;
+        inputContainer.replaceWith(newChatMessageText);
+        console.log("Document modifié avec succès !");
+        
+      }).catch((error) => {
+        console.error("Erreur lors de la modification du document :", error);
+      });
+     
+    });
+  }
 })

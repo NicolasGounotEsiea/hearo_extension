@@ -4,7 +4,15 @@
   src: url(../fonts/Rubik-VariableFont_wght.ttf);
 }
 
-
+input[type="text"] {
+  padding: 5px;
+  border: none;
+  border-radius: 10px;
+  outline: none;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+  width: 80%;
+  box-sizing: border-box;
+}
 
 /* HTML PAGE */
 html {
@@ -366,8 +374,10 @@ body {
 }
 
 .chat-message-content {
-  flex-grow: 1;
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  position: relative;;
+  
 }
 
 .chat-message-username {
@@ -389,25 +399,62 @@ body {
   align-items: flex-end;
   justify-content: flex-end;
 }
-
+.message-buttons {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+}
 .delete-message-button{
   width: 15px;
   height: 15px;
   border: none;
   background-color: transparent;
   padding: 0;
-  margin-right: 5px;
+  margin-right: 15px;
   background-image: url(../icons/icons8-supprimer-pour-toujours-48.png);
   background-repeat: no-repeat;
   background-size: 100% 100%;
   cursor: pointer;
 }
 
-.delete-message-button:hover{
+.edit-message-button {
+  width: 15px;
+  height: 15px;
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  margin-left: 20px;
+  background-image: url(../icons/icons8-crayon-48.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  cursor: pointer;
+}
+
+.validate-edit{
+  width: 15px;
+  height: 15px;
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  background-image: url(../icons/icons8-approved-checkmark-symbol-to-verify-the-result-24.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  margin-left:5px ;
+  cursor: pointer;
+}
+.validate-edit:hover, .delete-message-button:hover{
   transform: scale(1.2);
 }
 
-.delete-message-button:active {
+.validate-edit:hover,.delete-message-button:active {
+  transform: scale(0.8);
+}
+.edit-message-button:hover{
+  transform: scale(1.2);
+}
+
+.edit-message-button:active {
   transform: scale(0.8);
 }
 
